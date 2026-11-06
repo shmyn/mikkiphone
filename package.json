@@ -1,0 +1,10 @@
+{
+  "name": "mikkiphone",
+  "private": true,
+  "description": "미끼폰: 가짜 폰 알림으로 피싱 취약 유형을 진단하는 정적 웹 시뮬레이션",
+  "scripts": {
+    "test": "node --test tests/*.test.js",
+    "build": "python3 scripts/build.py"
+  },
+  "license": "MIT"
+}

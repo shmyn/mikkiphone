@@ -1,0 +1,216 @@
+[
+  {
+    "file": "photos/sea.jpg",
+    "url": "https://images.unsplash.com/photo-1500375592092-40eb2168fd21?auto=format&fit=crop&w=1000&q=82",
+    "bytes": 170739
+  },
+  {
+    "file": "photos/cat.jpg",
+    "url": "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=1000&q=82",
+    "bytes": 71246
+  },
+  {
+    "file": "photos/mountain.jpg",
+    "url": "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1000&q=82",
+    "bytes": 189339
+  },
+  {
+    "file": "photos/cafe.jpg",
+    "url": "https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=1000&q=82",
+    "bytes": 261091
+  },
+  {
+    "file": "photos/friends.jpg",
+    "url": "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=1000&q=82",
+    "bytes": 98211
+  },
+  {
+    "file": "photos/team.jpg",
+    "url": "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1000&q=82",
+    "bytes": 120160
+  },
+  {
+    "file": "photos/food.jpg",
+    "url": "https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=1000&q=82",
+    "bytes": 179959
+  },
+  {
+    "file": "photos/knit.jpg",
+    "url": "https://images.unsplash.com/photo-1434389677669-e08b4cac3105?auto=format&fit=crop&w=1000&q=82",
+    "bytes": 274910
+  },
+  {
+    "file": "brands/kakaotalk.svg",
+    "url": "https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/kakaotalk.svg",
+    "bytes": 1772
+  },
+  {
+    "file": "brands/naver.svg",
+    "url": "https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/naver.svg",
+    "bytes": 179
+  },
+  {
+    "file": "brands/x.svg",
+    "url": "https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/x.svg",
+    "bytes": 299
+  },
+  {
+    "file": "brands/gmail.svg",
+    "url": "https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/gmail.svg",
+    "bytes": 339
+  },
+  {
+    "file": "brands/chrome.svg",
+    "url": "https://www.google.com/chrome/static/images/chrome-logo.svg",
+    "license": "Google brand asset; referential mockup use"
+  },
+  {
+    "file": "brands/gmail.png",
+    "url": "https://www.gstatic.com/images/branding/product/2x/gmail_48dp.png",
+    "license": "Google brand asset; referential mockup use"
+  },
+  {
+    "file": "brands/coupang.png",
+    "url": "https://image7.coupangcdn.com/image/coupang/common/logo_coupang_w350.png",
+    "license": "Coupang brand asset; referential mockup use"
+  },
+  {
+    "file": "photos/workspace.jpg",
+    "url": "https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=1200&q=85",
+    "license": "Unsplash License"
+  },
+  {
+    "file": "photos/wedding.jpg",
+    "url": "https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1200&q=85",
+    "license": "Unsplash License"
+  },
+  {
+    "file": "brands/kakao-app.png",
+    "url": "https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/d5/ee/f4/d5eef492-91fa-22d7-6c4d-c73ff7fa657d/AppIcon-0-0-1x_U007epad-0-0-0-1-0-0-sRGB-85-220.png/512x512bb.jpg",
+    "reference": "https://apps.apple.com/kr/app/%EC%B9%B4%EC%B9%B4%EC%98%A4%ED%86%A1-kakaotalk/id362057947?uo=4",
+    "license": "Official App Store brand artwork; referential mockup use"
+  },
+  {
+    "file": "brands/toss-app.png",
+    "url": "https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/a6/14/86/a61486b9-aa38-7e88-43dd-cff5f5f8b6e9/AppIcon-0-0-1x_U007ephone-0-1-0-85-220.png/512x512bb.jpg",
+    "reference": "https://apps.apple.com/kr/app/%ED%86%A0%EC%8A%A4/id839333328?uo=4",
+    "license": "Official App Store brand artwork; referential mockup use"
+  },
+  {
+    "file": "brands/blog-app.png",
+    "url": "https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/7e/06/16/7e061608-7c43-0116-c820-25ba57bc8380/AppIcon-0-0-1x_U007epad-0-1-0-85-220.png/512x512bb.jpg",
+    "reference": "https://apps.apple.com/kr/app/%EB%84%A4%EC%9D%B4%EB%B2%84-%EB%B8%94%EB%A1%9C%EA%B7%B8-naver-blog/id328813873?uo=4",
+    "license": "Official App Store brand artwork; referential mockup use"
+  },
+  {
+    "file": "brands/coupang-app.png",
+    "url": "https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/a6/57/6c/a6576ca9-0239-3505-b6c2-2894b1a519f8/AppIcon-0-0-1x_U007emarketing-0-11-0-sRGB-85-220.png/512x512bb.jpg",
+    "reference": "https://apps.apple.com/kr/app/%EC%BF%A0%ED%8C%A1-coupang-%EB%AA%A8%EB%B0%94%EC%9D%BC-%EC%87%BC%ED%95%91/id454434967?uo=4",
+    "name": "쿠팡(Coupang)-모바일 쇼핑",
+    "license": "Official App Store brand artwork; referential mockup use"
+  },
+  {
+    "file": "brands/map-app.png",
+    "url": "https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/09/5a/aa/095aaabe-d3ce-cb18-ebd0-f2d6483946c9/AppIcon-0-0-1x_U007epad-0-1-0-85-220.png/512x512bb.jpg",
+    "reference": "https://apps.apple.com/kr/app/%EB%84%A4%EC%9D%B4%EB%B2%84%EC%A7%80%EB%8F%84-%EC%9E%A5%EC%86%8C%EC%9D%98-%EB%B0%9C%EA%B2%AC%EA%B3%BC-%EC%98%88%EC%95%BD-%EB%82%B4%EB%B9%84%EA%B2%8C%EC%9D%B4%EC%85%98/id311867728?uo=4",
+    "name": "네이버지도 - 장소의 발견과 예약, 내비게이션",
+    "license": "Official App Store brand artwork; referential mockup use"
+  },
+  {
+    "file": "brands/x-app.png",
+    "url": "https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/66/9c/7c/669c7c1b-b5c8-93e5-4c08-7d8ca52d7b84/ProductionAppIcon-0-0-1x_U007emarketing-0-8-0-0-0-85-220.png/512x512bb.jpg",
+    "reference": "https://apps.apple.com/kr/app/x/id333903271?uo=4",
+    "name": "X",
+    "license": "Official App Store brand artwork; referential mockup use"
+  },
+  {
+    "file": "brands/chrome-app.png",
+    "url": "https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/1d/84/62/1d8462cc-1b5c-90ee-1c12-6570a213d0e5/AppIcon-0-0-1x_U007epad-0-0-0-1-0-0-sRGB-85-220.png/512x512bb.jpg",
+    "reference": "https://apps.apple.com/kr/app/google-chrome/id535886823?uo=4",
+    "name": "Google Chrome",
+    "license": "Official App Store brand artwork; referential mockup use"
+  },
+  {
+    "file": "brands/gmail-app.png",
+    "url": "https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/83/a9/eb/83a9eb0a-ab2b-da1f-41a9-8357822787a8/gmail_2026_ios-0-0-1x_U007epad-0-0-0-1-0-0-0-0-85-220.png/512x512bb.jpg",
+    "reference": "https://apps.apple.com/kr/app/gmail-google%EC%9D%B4-%EC%A0%9C%EA%B3%B5%ED%95%98%EB%8A%94-%EC%9D%B4%EB%A9%94%EC%9D%BC/id422689480?uo=4",
+    "name": "Gmail: Google이 제공하는 이메일",
+    "license": "Official App Store brand artwork; referential mockup use"
+  },
+  {
+    "file": "brands/gmail-transparent.svg",
+    "url": "https://fonts.gstatic.com/s/i/productlogos/gmail_2020q4/v6/192px.svg",
+    "license": "Google official vector brand asset; referential mockup use"
+  },
+  {
+    "file": "brands/kakao-desktop.svg",
+    "source": "Project-native SVG recreation of the KakaoTalk speech bubble; transparent desktop canvas",
+    "license": "Project-authored vector; brand remains with Kakao"
+  },
+  {
+    "file": "brands/kakao-flat.svg",
+    "source": "Project-native flat SVG recreation for the simulated phone",
+    "license": "Project-authored vector; brand remains with Kakao"
+  },
+  {
+    "file": "photos/headphones.jpg",
+    "url": "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=1100&q=88",
+    "license": "Unsplash License"
+  },
+  {
+    "file": "photos/sneakers.jpg",
+    "url": "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=1100&q=88",
+    "license": "Unsplash License"
+  },
+  {
+    "file": "photos/backpack.jpg",
+    "url": "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=1100&q=88",
+    "license": "Unsplash License"
+  },
+  {
+    "file": "photos/watch.jpg",
+    "url": "https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=1100&q=88",
+    "license": "Unsplash License"
+  },
+  {
+    "file": "photos/mug.jpg",
+    "url": "https://images.unsplash.com/photo-1514228742587-6b1558fcca3d?auto=format&fit=crop&w=1100&q=88",
+    "license": "Unsplash License"
+  },
+  {
+    "file": "photos/keyboard.jpg",
+    "url": "https://images.unsplash.com/photo-1587829741301-dc798b83add3?auto=format&fit=crop&w=1100&q=88",
+    "license": "Unsplash License"
+  },
+  {
+    "file": "photos/lamp.jpg",
+    "url": "https://images.unsplash.com/photo-1507473885765-e6ed057f782c?auto=format&fit=crop&w=1100&q=88",
+    "license": "Unsplash License"
+  },
+  {
+    "file": "photos/mouse.jpg",
+    "url": "https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?auto=format&fit=crop&w=1100&q=88",
+    "license": "Unsplash License"
+  },
+  {
+    "file": "photos/profile-seoyeon.jpg",
+    "url": "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=1100&q=88",
+    "license": "Unsplash License"
+  },
+  {
+    "file": "photos/profile-park.jpg",
+    "url": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=1100&q=88",
+    "license": "Unsplash License"
+  },
+  {
+    "file": "photos/profile-yujin.jpg",
+    "url": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=1100&q=88",
+    "license": "Unsplash License"
+  },
+  {
+    "file": "brands/kakao-android.png",
+    "url": "https://play-lh.googleusercontent.com/VaxoIL0V83FKXsQ5fOR0XJ3CQ7Q_eOt_WXuKFtnuK3nWUH_SOll1_LRK5AlXE7b8sUg4iHNKBVof1zV1haQRyw=w512-h512",
+    "reference": "https://play.google.com/store/apps/details?id=com.kakao.talk",
+    "license": "Official Google Play brand artwork; referential mockup use"
+  }
+]
