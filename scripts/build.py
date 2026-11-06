@@ -127,13 +127,13 @@ def preview():
     html = (ROOT / "index.html").read_text(encoding="utf-8")
     css = (ROOT / "css/style.css").read_text(encoding="utf-8")
     html = re.sub(r'\s*<meta http-equiv="Content-Security-Policy"[^>]*>', "", html)
-    html = html.replace('<link rel="stylesheet" href="css/style.css">', f"<style>\n{css}\n</style>")
-    html = html.replace('<link rel="stylesheet" href="css/apps.css">', "<style>\n" + (ROOT / "css/apps.css").read_text(encoding="utf-8") + "\n</style>")
+    html = re.sub(r'<link rel="stylesheet" href="css/style\.css(?:\?[^"]*)?">', lambda m: f"<style>\n{css}\n</style>", html)
+    html = re.sub(r'<link rel="stylesheet" href="css/apps\.css(?:\?[^"]*)?">', lambda m: "<style>\n" + (ROOT / "css/apps.css").read_text(encoding="utf-8") + "\n</style>", html)
     html = re.sub(r'\s*<link rel="icon"[^>]*>', "", html)
     html = re.sub(r'\s*<meta property="og:image"[^>]*>', "", html)
     for js in ["config", "icons", "data.common", "data.phone", "data.pc", "scoring", "core", "world", "social", "phone", "pc", "main"]:
         code = (ROOT / f"js/{js}.js").read_text(encoding="utf-8")
-        html = html.replace(f'<script src="js/{js}.js"></script>', f"<script>\n{code}\n</script>")
+        html = re.sub(rf'<script src="js/{re.escape(js)}\.js(?:\?[^"]*)?"></script>', lambda m: f"<script>\n{code}\n</script>", html)
     images = {}
     for image_path in (ROOT / "assets").rglob("*"):
         if image_path.is_file() and image_path.suffix.lower() in (".jpg", ".png", ".svg"):
