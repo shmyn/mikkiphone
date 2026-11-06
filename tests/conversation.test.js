@@ -477,3 +477,15 @@ test('예약 알림은 원래 순서를 유지하고 최소 18초 간격으로 �
     assert.ok(MK.S.schedule[arrivals.at(-1).id]<MK.D.SESSION_END_SEC*1000);
   }
 });
+
+
+test('미션 전에 일반·피싱 전화와 PC 경고창을 먼저 배치한다', () => {
+  const {MK}=engine();MK.prepare('phone');
+  const phone=Object.keys(MK.S.schedule).sort((a,b)=>MK.S.schedule[a]-MK.S.schedule[b]);
+  assert.deepEqual(phone.slice(0,2),['L5','s4']);
+  assert.equal(MK.ITEM.L5.kind,'legit');assert.equal(MK.ITEM.s4.kind,'phish');
+  assert.ok(MK.S.schedule.s4<MK.S.schedule.L1);
+  MK.prepare('pc');
+  assert.ok(MK.S.schedule.P4<MK.S.schedule.Lp2);
+  assert.ok(MK.S.schedule.Lp4<MK.S.schedule.Lp2);
+});

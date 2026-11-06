@@ -57,6 +57,8 @@ def result_page(key, t, site):
 <head>
   <meta charset="utf-8">
   <meta http-equiv="Content-Security-Policy" content="{CSP}">
+  <meta name="color-scheme" content="light">
+  <meta name="theme-color" content="#303030">
   <meta name="referrer" content="no-referrer">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>미끼폰 결과: {escape(t['name'])}</title>

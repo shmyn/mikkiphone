@@ -8,20 +8,8 @@
   --phone-body: #1f2427; --focus: #1f6fd1; --link: #2a6fcb;
   --sel: #dbe9f6; --chrome: rgba(240, 244, 246, 0.94); --chrome-ink: #16232a; --panel: #f8fafb; --hover: rgba(0, 0, 0, 0.06);
   --font: "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", "Noto Sans CJK KR", system-ui, sans-serif;
-  color-scheme: light; box-sizing: border-box;
+  color-scheme: only light; box-sizing: border-box;
   padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px);
-}
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --water: #12212a; --water-deep: #0d1a21; --ink: #e3edf0; --ink-soft: #9fb3bb; --line: #33505c;
-    --paper: #1b2a32; --screen-bg: #172329; --screen-ink: #e6eef1; --screen-soft: #9db0b8;
-    --bubble-in: #24343c; --bubble-me: #3b7fa1; --phone-body: #05090b; --focus: #6aa8ff; --link: #6aa8ff; --sel: #23465c; --chrome: rgba(22, 34, 40, 0.94); --chrome-ink: #e6eef1; --panel: #1c2b33; --hover: rgba(255, 255, 255, 0.08); color-scheme: dark;
-  }
-}
-:root[data-theme="dark"] {
-  --water: #12212a; --water-deep: #0d1a21; --ink: #e3edf0; --ink-soft: #9fb3bb; --line: #33505c;
-  --paper: #1b2a32; --screen-bg: #172329; --screen-ink: #e6eef1; --screen-soft: #9db0b8;
-  --bubble-in: #24343c; --bubble-me: #3b7fa1; --phone-body: #05090b; --focus: #6aa8ff; --link: #6aa8ff; --sel: #23465c; --chrome: rgba(22, 34, 40, 0.94); --chrome-ink: #e6eef1; --panel: #1c2b33; --hover: rgba(255, 255, 255, 0.08); color-scheme: dark;
 }
 *, *::before, *::after { box-sizing: inherit; }
 html, body { height: 100%; margin: 0; }
