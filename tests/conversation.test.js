@@ -77,7 +77,7 @@ test('메일 요청 → 상대 답장 → 첨부 메일 순서를 유지하고 �
   flush();
   const entries = MK.S.timeline.pm_partner;
   assert.deepEqual(Array.from(entries, e => e.item || e.text), [
-    'Lp2', '회사 소개서도 메일로 부탁드려요', '네, 바로 보내드리겠습니다.', 'Lp11'
+    'Lp2', '회사 소개서 보내주실 수 있을까요?', '네, 바로 보내드리겠습니다.', 'Lp11'
   ]);
   assert.ok(!MK.replyChips('pm_partner').some(x => x.label.includes('검토 후')));
 });
@@ -153,7 +153,7 @@ test('PC 메일 화면에도 요청과 첨부 메일이 실제 발생 순서대�
   const body = find(root, n => n.className === 'read-body');
   function text(n) { return n.textContent + (n.children || []).map(text).join(''); }
   const content = text(body);
-  assert.ok(content.indexOf('회사 소개서도 메일로 부탁드려요') < content.indexOf('네, 바로 보내드리겠습니다.'));
+  assert.ok(content.indexOf('회사 소개서 보내주실 수 있을까요?') < content.indexOf('네, 바로 보내드리겠습니다.'));
   assert.ok(content.indexOf('네, 바로 보내드리겠습니다.') < content.indexOf('회사 소개서 보내드립니다'));
 });
 
@@ -167,13 +167,16 @@ function clickNode(root, pred) { const found = findNode(root, pred); assert.ok(f
 test('한빛상사 홈페이지 → 담당자 메일 요청 → 소개서 열기로 업무를 완료한다', () => {
   const {MK, PCUI, root, flush} = engine();
   MK.ui = PCUI; PCUI.mount(); MK.S.running = true; PCUI.render();
+  MK.deliver(MK.ITEM.Lp2);
+  act(root,'desk-mail');act(root,'open-pm_partner');act(root,'reply-to-Lp2');
   clickNode(root, n => n.attrs && n.attrs['data-act'] === 'desk-browser');
   clickNode(root, n => n.tag === 'button' && n.textContent === '한빛상사');
   clickNode(root, n => n.tag === 'button' && n.textContent === '담당자에게 메일로 요청');
-  clickNode(root, n => n.tag === 'button' && n.textContent === '회사 소개서도 메일로 부탁드려요');
+  act(root,'ask-company-profile');
   // Rendering a mail pane also schedules scroll callbacks.
   flush(); flush();
-  clickNode(root, n => n.attrs && n.attrs['data-act'] === 'att-open');
+  assert.equal(MK.S.delivered.Lp11,true);
+  clickNode(root, n => n.attrs && n.attrs['aria-label'] === '한빛상사_회사소개서.pdf 열기');
   assert.equal(MK.S.tasks.t3, true);
   assert.equal(MK.S.st.P1.result, 'safe');
 });
@@ -390,7 +393,7 @@ test('한빛상사는 제품 상세와 자료실을 제공하고 메일 요청�
   clickNode(root,n=>n.tag==='button'&&n.textContent==='제품안내');act(root,'company-product-keyboard');
   assert.ok(textOf(root).includes('수량별 견적 협의'));
   clickNode(root,n=>n.tag==='button'&&n.textContent==='자료실');assert.ok(textOf(root).includes('PDF 4MB'));
-  clickNode(root,n=>n.tag==='button'&&n.textContent==='담당자에게 메일로 요청');assert.ok(textOf(root).includes('회사 소개서도 메일로 부탁드려요'));
+  clickNode(root,n=>n.tag==='button'&&n.textContent==='담당자에게 메일로 요청');assert.ok(textOf(root).includes('회사 소개서 보내주실 수 있을까요?'));
 });
 
 test('IT 확인 대화는 먼저 질문하고 발신 정보를 전달한 후에만 확인으로 기록한다', () => {
@@ -543,10 +546,10 @@ test('추가 일상 미션은 단톡방 답장과 가족 통화 선택에 연결
   assert.ok(MK.D.CONTACTS.find(ct=>ct.key==='mom').dialog.nodes.a.choices.some(ch=>ch.task==='t5'));
 });
 
-test('PC 감염 팝업은 브라우저를 사용할 때만 나오며 업데이트 미션은 읽기와 실제 예약을 요구한다', () => {
+test('PC 감염 팝업은 바탕화면에서도 나오며 업데이트 미션은 읽기와 실제 예약을 요구한다', () => {
   const {MK,PCUI,root}=engine();MK.ui=PCUI;PCUI.mount();MK.S.running=true;PCUI.render();
-  MK.deliver(MK.ITEM.P4);assert.equal(MK.S.delivered.P4,true);assert.equal(MK.S.st.P4.opened,false);
-  assert.ok(!findNode(root,n=>n.className==='scam-popup'));act(root,'desk-browser');assert.equal(MK.S.st.P4.opened,true);
+  MK.deliver(MK.ITEM.P4);assert.equal(MK.S.delivered.P4,true);assert.equal(MK.S.st.P4.opened,true);
+  assert.ok(findNode(root,n=>n.className==='scam-popup'));
   act(root,'popup-close');
   MK.deliver(MK.ITEM.Lp3);MK.markOpened(MK.ITEM.Lp3);assert.equal(MK.S.tasks.t5,undefined);
   MK.deliver(MK.ITEM.Lp4);clickNode(root,n=>n.tag==='button'&&n.textContent==='Windows 업데이트 열기');
@@ -571,13 +574,20 @@ for(const dev of ['phone','pc']) {
     const e=engine(),{MK}=e;MK.UI[dev]=dev==='phone'?e.PhoneUI:e.PCUI;MK.prepare(dev);act(e.root,'start');
     const scheduled=MK.D.ITEMS.filter(it=>it.at!=null).map(it=>it.id);
     assert.equal(MK.D.RECOMMENDED_SEC,300);
-    for(let elapsed=0;elapsed<MK.D.RECOMMENDED_SEC*1000;elapsed+=250)e.tick(250);
+    for(let elapsed=0;elapsed<180000;elapsed+=250)e.tick(250);
+    if(dev==='pc') {
+      assert.ok(findNode(e.root,n=>n.className==='scam-popup'));
+      assert.ok(!MK.S.eventsDone);
+      assert.ok(!MK.S.resultPrompt);
+      act(e.root,'popup-close');
+      e.tick(250);
+    }
     assert.equal(MK.S.ended,false);assert.equal(MK.S.eventsDone,true);
     assert.ok(textOf(e.root).includes('결과를 확인할까요?'));
     assert.deepEqual(scheduled.filter(id=>!MK.S.delivered[id]),[]);
     if(dev==='phone') {
-      act(e.root,'keep-playing');const time=MK.S.used;e.tick(1000);
-      assert.equal(MK.S.used,time+1000);assert.equal(MK.S.resultPrompt,null);
+      act(e.root,'keep-playing');const time=MK.S.used;e.tick(301000);
+      assert.equal(MK.S.used,time+301000);assert.equal(MK.S.resultPrompt,null);
       assert.equal(MK.S.ended,false);act(e.root,'finish');
     } else {
       act(e.root,'event-results');

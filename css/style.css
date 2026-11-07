@@ -465,6 +465,11 @@ a.modebtn { text-decoration: none; }
 .pcmemo .memo-h { height: 36px; padding-top: 8px; margin-bottom: 10px; font-weight: 600; }
 .pcmemo .task { font-size: 12px; line-height: 1.6; padding: 4px 0; }
 .win { left: 104px; right: 270px; top: 16px; bottom: 62px; border: 1px solid #a5b8cb50; box-shadow: 0 18px 50px #00132e60, 0 2px 8px #00132e30; }
+@media (min-width: 821px) and (pointer: fine) {
+  .win:not(.max) { translate: clamp(-104px, var(--win-x, 0px), 270px) clamp(-16px, var(--win-y, 0px), 14px); }
+  .win:not(.max) .win-title { cursor: grab; touch-action: none; }
+  .win:not(.max) .win-title:active { cursor: grabbing; }
+}
 .win-title { height: 36px; background: var(--chrome); font-size: 12px; font-weight: 400; }
 .win-btn { border-radius: 0; }
 .win .panes { grid-template-columns: minmax(175px, 31%) minmax(0, 1fr); }

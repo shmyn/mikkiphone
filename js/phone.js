@@ -62,6 +62,7 @@
     var r = MK.S.route && MK.S.route.name;
     if (!P.call && (r === "home" || r === "app" || (r === "thread" && MK.S.route.id === it.thread))) render();
   };
+  UI.blocksResultPrompt = function () { return !!P.call; };
   UI.tick = function (t) { if (P.call) callTick(t); };
   UI.render = function () { render(); };
   UI.refreshThread = function (id) { if (MK.S.route.name === "thread" && MK.S.route.id === id && !P.call) render(); };

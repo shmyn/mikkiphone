@@ -229,11 +229,12 @@
     });
     if (MK.ui.tick) MK.ui.tick(t);
     if (MK.revealTasks(t)) MK.ui.render();
-    if (!S.eventsDone && S.scheduledItems.every(function (it) { return S.delivered[it.id]; })) {
+    var blocked = MK.ui.blocksResultPrompt && MK.ui.blocksResultPrompt();
+    if (!S.eventsDone && !blocked && S.scheduledItems.every(function (it) { return S.delivered[it.id]; })) {
       S.eventsDone = true;
       S.progressLabel.textContent = "이벤트 종료";
     }
-    if (S.eventsDone && !S.resultsOffered && !S.leavePrompt && !document.hidden) offerResults(S);
+    if (S.eventsDone && !S.resultsOffered && !S.leavePrompt && !document.hidden && !blocked) offerResults(S);
     S.progress.setAttribute("value", S.eventsDone ? S.eventEndSec : Math.min(S.eventEndSec - 0.25, t / 1000));
   }
   document.addEventListener("visibilitychange", function () { if (MK.S) MK.S.last = performance.now(); });
@@ -362,7 +363,7 @@
     ((MK.D.THREADS[threadId].asks) || []).forEach(function (a, i) {
       if (MK.S.askUsed[threadId + ":" + i]) return;
       if (!MK.choiceAvailable(a)) return;
-      out.push({ label: a.label, act: a.verify ? "ask-verify" : "ask", run: function () { MK.ask(threadId, a, i); } });
+      out.push({ label: a.label, act: a.act || (a.verify ? "ask-verify" : "ask"), run: function () { MK.ask(threadId, a, i); } });
     });
     return out;
   };

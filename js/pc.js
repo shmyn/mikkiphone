@@ -10,10 +10,10 @@
   var UI = MK.UI.pc = {};
 
   UI.mount = function () {
-    P = { app: null, max: false, replyTo: null, chatTab: "chats", chatUnread: false, chatMenu: false, galleryFilter: "all", chatScroll: {}, sel: { mail: null, chat: null }, folder: "다운로드", zip: null,
+    P = { app: null, max: false, windowPositions: {}, replyTo: null, chatTab: "chats", chatUnread: false, chatMenu: false, galleryFilter: "all", chatScroll: {}, sel: { mail: null, chat: null }, folder: "다운로드", zip: null,
       browser: { page: null, item: null, stack: [], clickfix: null, done: {}, dl: null, shopTab: "home", companyTab: "home" },
       files: MK.D.FILES["다운로드"].map(function (f) { return { name: f.name, type: f.type }; }),
-      modal: null, popup: null, pendingPopup: null, notifs: [], center: false, start: false, dnd: false };
+      modal: null, popup: null, notifs: [], center: false, start: false, dnd: false };
     deskEl = el("div", { cls: "desk" });
     toastEl = el("div", { cls: "toasts", attrs: { "aria-live": "polite" } });
     screenEl = el("div", { cls: "pc-screen" }, deskEl, toastEl);
@@ -35,7 +35,12 @@
 
   // ---------- 엔진 연결 ----------
   UI.onDeliver = function (it) {
-    if (it.channel === "popup") { P.pendingPopup = it; render(); return; }
+    if (it.channel === "popup") {
+      P.popup = { item: it, stage: 0 };
+      MK.markOpened(it);
+      render(true);
+      return;
+    }
     if (it.channel === "page") return;
     var th = it.thread ? MK.D.THREADS[it.thread] : null;
     var app = th ? th.app : "system";
@@ -45,6 +50,7 @@
     if (!P.modal && !P.popup) render();
   };
   UI.render = function () { render(); };
+  UI.blocksResultPrompt = function () { return !!P.popup; };
   UI.browserBack = function () {
     if (P.popup) P.popup = null;
     else if (P.modal) P.modal = null;
@@ -91,9 +97,7 @@
   // ---------- 그리기 ----------
   function render(moved) {
     if (!MK.S || MK.S.ended || !MK.S.running) return;
-    if (P.pendingPopup && P.app === "browser" && !P.modal && !P.popup && !P.browser.clickfix) {
-      P.popup = { item: P.pendingPopup, stage: 0 }; MK.markOpened(P.pendingPopup); P.pendingPopup = null;
-    }
+    if (P.dragging) { P.redrawAfterDrag = true; return; }
     var kids = [desktop()];
     if (P.app) kids.push(windowView());
     if (P.start) kids.push(startMenu());
@@ -103,7 +107,7 @@
     if (P.popup) kids.push(popupView());
     deskEl.replaceChildren.apply(deskEl, kids);
     if (moved) {
-      var focusTarget = deskEl.querySelector(".modal, .scam-popup, .win") || deskEl;
+      var focusTarget = deskEl.querySelector(".scam-popup") || deskEl.querySelector(".modal, .win") || deskEl;
       MK.focusView(focusTarget);
     }
   }
@@ -180,8 +184,49 @@
         iconBtn("win-btn", "minimize", "최소화", function () { P.app = null; render(true); }, "minimize", 16),
         iconBtn("win-btn", P.max ? "restore" : "maximize", P.max ? "이전 크기로" : "최대화", function () { P.max = !P.max; render(); }, "maximize", 16),
         iconBtn("win-btn win-close", "close", "닫기", function () { P.app = null; render(true); }, "close", 16)));
-    title.addEventListener("dblclick", function () { P.max = !P.max; render(); });
-    return el("section", { cls: "win win-" + a + (P.max ? " max" : ""), attrs: { "aria-label": APPS[a] } }, title, body);
+    title.addEventListener("dblclick", function (event) {
+      if (!event.target.closest("button")) { P.max = !P.max; render(); }
+    });
+    var win = el("section", { cls: "win win-" + a + (P.max ? " max" : ""), attrs: { "aria-label": APPS[a] } }, title, body);
+    if (!P.max) enableWindowMove(win, title, a);
+    return win;
+  }
+
+  function enableWindowMove(win, title, app) {
+    var position = P.windowPositions[app] || { x: 0, y: 0 };
+    function applyPosition() {
+      win.style.setProperty("--win-x", position.x + "px");
+      win.style.setProperty("--win-y", position.y + "px");
+    }
+    if (P.windowPositions[app]) applyPosition();
+    var drag;
+    title.addEventListener("pointerdown", function (event) {
+      if (event.button !== 0 || !event.isPrimary || event.target.closest("button") ||
+          !window.matchMedia("(min-width: 821px) and (pointer: fine)").matches) return;
+      var rect = win.getBoundingClientRect();
+      var desk = deskEl.getBoundingClientRect();
+      drag = {
+        id: event.pointerId, x: event.clientX, y: event.clientY,
+        offsetX: rect.left - desk.left - win.offsetLeft,
+        offsetY: rect.top - desk.top - win.offsetTop,
+        minX: desk.left - rect.left, maxX: desk.right - rect.right,
+        minY: desk.top - rect.top, maxY: deskEl.querySelector(".taskbar").getBoundingClientRect().top - rect.bottom
+      };
+      title.setPointerCapture(drag.id);
+      P.dragging = true;
+    });
+    title.addEventListener("pointermove", function (event) {
+      if (!drag || event.pointerId !== drag.id) return;
+      position.x = drag.offsetX + Math.max(drag.minX, Math.min(drag.maxX, event.clientX - drag.x));
+      position.y = drag.offsetY + Math.max(drag.minY, Math.min(drag.maxY, event.clientY - drag.y));
+      P.windowPositions[app] = position;
+      applyPosition();
+    });
+    title.addEventListener("lostpointercapture", function () {
+      drag = null;
+      P.dragging = false;
+      if (P.redrawAfterDrag) { P.redrawAfterDrag = false; render(); }
+    });
   }
 
   // 메일
@@ -367,7 +412,14 @@
   }
   function pageAction(p, a, it) {
     var B = P.browser;
-    if (a.contact) { P.sel.mail = a.contact; openApp("mail"); return; }
+    if (a.contact) {
+      P.sel.mail = a.contact;
+      P.replyTo = null;
+      openApp("mail");
+      var request = deskEl.querySelector('[data-act="ask-company-profile"]');
+      if (request) request.focus();
+      return;
+    }
     if (a.goto) { if (a.task) MK.doneTask(a.task); nav(a.goto, B.item); return; }
     if (a.clickfix) {
       var p1 = MK.ITEM.P1;
