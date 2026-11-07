@@ -416,7 +416,7 @@
   {
     "id": "L2",
     "kind": "legit",
-    "at": 3,
+    "at": 0,
     "title": "쿠팡 배송 시작 알림",
     "channel": "push",
     "app": "moamall",
