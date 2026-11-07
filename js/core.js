@@ -75,7 +75,7 @@
     document.body.className = "";
     var mobile = isMobileDevice();
     var card = el("section", { cls: "startcard" },
-      el("div", { cls: "start-logo" }, MK.icon("mikkiphone", 64)),
+      el("div", { cls: "bobber", attrs: { "aria-hidden": "true" } }),
       el("h1", { cls: "wordmark", text: "미끼폰" }),
       el("p", { cls: "lede", text: "나는 어떻게 낚이는 사람일까" }),
       el("p", { cls: "intro-purpose", text: "일상에서 마주칠 수 있는 피싱 위험에 대한 내 취약점을 진단하는 시뮬레이션" }),
@@ -466,11 +466,9 @@
 
     var page = el("section", { cls: "resultpage" });
     page.appendChild(el("button", {
-      cls: "result-home", attrs: { type: "button", "data-act": "result-home" }, onClick: MK.home
-    }, MK.icon("mikkiphone", 32),
-      el("strong", { text: "미끼폰" }), el("span", { text: "홈으로" })));
+      cls: "result-home", attrs: { type: "button", "data-act": "result-home", "aria-label": "미끼폰 홈으로" }, onClick: MK.home
+    }, el("span", { cls: "bobber", attrs: { "aria-hidden": "true" } }), el("span", { text: "미끼폰" })));
     page.appendChild(el("header", { cls: "r-head" },
-      el("p", { cls: "r-mode", text: "미끼폰 · " + modeName + " 결과" }),
       el("h2", { text: T.name }), el("p", { cls: "r-line", text: T.line }),
       el("div", { cls: "result-stats" },
         el("div", null, el("strong", { text: String(r.R) }), el("span", { text: "위험 지수 / 100" })),

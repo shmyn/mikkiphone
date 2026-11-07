@@ -207,7 +207,6 @@ img.photo.big { max-height:58vh; object-fit:contain; background:#111; }
 /* A short result, followed by one text-only disclosure. */
 .resultpage { width:min(620px,100%); padding:28px; gap:0; border-radius:20px; }
 .r-head { padding:0; }
-.r-mode { margin:0 0 12px; font-size:11px; letter-spacing:.04em; }
 .r-head h2 { margin:0 0 9px; font-size:clamp(24px,4vw,31px); line-height:1.35; }
 .r-line { font-size:13px; line-height:1.7; margin:0; }
 .result-stats { margin-top:20px; padding:17px 0; }
