@@ -460,8 +460,7 @@
     var phishRecs = recs.filter(function (x) { return MK.ITEM[x.id].kind === "phish"; });
     var legitRecs = recs.filter(function (x) { return MK.ITEM[x.id].kind === "legit"; });
     var modeName = MK.dev === "pc" ? "PC" : "휴대폰";
-    var shareText = "미끼폰(" + modeName + ") 결과: " + T.name + "\n" + r.emoji +
-      "\n미끼 " + r.phishCount + "개 중 " + r.exposures + "개 물림 · 진짜 연락 " + r.handled + "/" + r.legitCount;
+    var shareText = "미끼폰에서 ‘" + T.name + "’ 나왔어요.\n당신은 어떤 유형이 나올까요?";
     document.body.className = "";
 
     var page = el("section", { cls: "resultpage" });
@@ -496,12 +495,12 @@
     });
     content.appendChild(el("h3", { text: "기억할 습관" }));
     var tips = el("ul", { cls: "tips" }); T.tips.forEach(function (tip) { tips.appendChild(el("li", { text: tip })); }); content.appendChild(tips);
-    var box = el("pre", { cls: "sharebox", text: shareText + (shareUrl ? "\n" + shareUrl : "") });
+    var box = el("pre", { cls: "sharebox", text: shareText + (shareUrl ? "\n\n" + shareUrl : "") });
     content.appendChild(el("h3", { text: "공유할 결과 문구" })); content.appendChild(box);
     detail.appendChild(content); page.appendChild(detail);
     var note = el("p", { cls: "toast", attrs: { role: "status" } });
     page.appendChild(el("div", { cls: "sharebtns" },
-      btn("btn", "결과 화면 공유하기", function () { shareResult(shareUrl, box.textContent, note); }, "copy"),
+      btn("btn", "결과 화면 공유하기", function () { shareResult(box.textContent, note); }, "copy"),
       btn("btn ghost", "이미지 저장", function () { saveCard(r, T, phishRecs, note, modeName); }),
       btn("btn ghost", "X에 공유", function () { shareX(shareText, shareUrl); })));
     page.appendChild(note);
@@ -521,13 +520,13 @@
     var summary = [r.R, r.exposures, r.phishCount, r.handled, r.legitCount].join(",");
     return CONFIG.SITE_URL + "r/" + r.typeKey + ".html#" + summary;
   }
-  function shareResult(url, text, note) {
-    if (url && navigator.share) {
-      navigator.share({ title: "미끼폰 결과", url: url }).catch(function (error) {
-        if (error.name !== "AbortError") copy(url, note);
+  function shareResult(text, note) {
+    if (navigator.share) {
+      navigator.share({ text: text }).catch(function (error) {
+        if (error.name !== "AbortError") copy(text, note);
       });
     } else {
-      copy(url || text, note);
+      copy(text, note);
     }
   }
   function copy(text, t) {
