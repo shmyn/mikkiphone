@@ -83,11 +83,15 @@
   }
 
   // ---------- 이동 ----------
-  function rememberRoute(route) {
+  function rememberRoute(route, view) {
     var app = route.name === "app" ? route.app : (route.name === "thread" ? MK.D.THREADS[route.id].app : (route.name === "kakao" ? "talk" : (["page", "search"].indexOf(route.name) >= 0 ? "web" : null)));
     if (!app) return;
     P.recentRoutes = P.recentRoutes.filter(function (r) { return r.app !== app; });
-    P.recentRoutes.unshift({ app: app, route: Object.assign({}, route) });
+    var preview = view.cloneNode(true);
+    preview.setAttribute("inert", "");
+    preview.setAttribute("aria-hidden", "true");
+    preview.querySelectorAll("[id], [data-act]").forEach(function (node) { node.removeAttribute("id"); node.removeAttribute("data-act"); });
+    P.recentRoutes.unshift({ app: app, route: Object.assign({}, route), preview: preview });
     P.recentRoutes = P.recentRoutes.slice(0, 6);
   }
   function systemNavigation() {
@@ -100,15 +104,31 @@
   }
   function recentAppsView() {
     var view = el("div", { cls: "view recent-apps" }, el("h2", { text: "최근 사용한 앱" }));
-    if (!P.recentRoutes.length) view.appendChild(el("p", { text: "앱을 열면 여기에 표시돼요" }));
+    if (!P.recentRoutes.length) {
+      view.appendChild(el("p", { cls: "recent-empty", text: "최근 사용한 앱이 없어요" }));
+      return view;
+    }
+    var track = el("div", { cls: "recent-track", attrs: { "aria-label": "최근 앱 미리보기" } });
     P.recentRoutes.forEach(function (recent) {
-      view.appendChild(el("button", { cls: "recent-app-card", attrs: { "data-act": "recent-" + recent.app }, onClick: function () { go(recent.route); } },
-        icon(recent.app, 30, true), el("strong", { text: APPS[recent.app] }), el("span", { text: "이어서 보기" })));
+      var start = null, swiped = false;
+      function dismiss() { P.recentRoutes = P.recentRoutes.filter(function (entry) { return entry !== recent; }); render(true); }
+      var hit = el("button", { cls: "recent-hit", attrs: { "aria-label": APPS[recent.app] + " 이어서 보기", "aria-keyshortcuts": "Delete", "data-act": "recent-" + recent.app }, onClick: function () { if (!swiped) go(recent.route); } });
+      hit.addEventListener("pointerdown", function (event) { swiped = false; start = { x: event.clientX, y: event.clientY }; });
+      hit.addEventListener("pointercancel", function () { start = null; });
+      hit.addEventListener("pointerup", function (event) {
+        if (start && start.y - event.clientY > 48 && start.y - event.clientY > Math.abs(start.x - event.clientX) * 1.2) { swiped = true; dismiss(); }
+        start = null;
+      });
+      hit.addEventListener("keydown", function (event) { if (event.key === "Delete") { event.preventDefault(); dismiss(); } });
+      track.appendChild(el("section", { cls: "recent-app-card" },
+        el("div", { cls: "recent-card-label", attrs: { "aria-hidden": "true" } }, el("i", { cls: "recent-app-icon app-" + recent.app }, icon(recent.app, 26, true)), el("strong", { text: APPS[recent.app] })),
+        el("div", { cls: "recent-thumbnail", attrs: { "aria-hidden": "true" } }, recent.preview.cloneNode(true)), hit));
     });
+    view.appendChild(track);
+    view.appendChild(btn("recent-clear", "모두 닫기", function () { P.recentRoutes = []; home(); }, "recent-clear"));
     return view;
   }
   function go(route, reset) {
-    rememberRoute(route);
     if (reset) MK.S.stack = []; else MK.S.stack.push(MK.S.route);
     MK.S.route = route;
     render(true);
@@ -120,12 +140,14 @@
     return false;
   };
   function home() { go({ name: "home" }, true); }
-  function setRoute(r) { rememberRoute(r); MK.S.route = r; render(); }
+  function setRoute(r) { MK.S.route = r; render(); }
 
   function render(moved) {
     if (!MK.S || MK.S.ended || !MK.S.route) return;
+    if (!moved && !P.call && MK.S.route.name === "recents" && hostEl.querySelector(".recent-apps")) return;
     setStatus();
     var v = P.call ? callView() : routeView(MK.S.route);
+    if (!P.call) rememberRoute(MK.S.route, v);
     hostEl.replaceChildren(v);
     if (moved) MK.focusView(v); // 선택지에 미리 초점을 주지 않는다
   }

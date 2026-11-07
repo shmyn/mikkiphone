@@ -22,10 +22,22 @@
 .glyph-system-back::after { content:""; position:absolute; width:12px; height:12px; top:3px; left:6px; border-left:2px solid currentColor; border-bottom:2px solid currentColor; transform:rotate(45deg); }
 .screen:has(.camera-app,.photo-detail,.callscreen) { background:#101114; }
 .screen:has(.camera-app,.photo-detail,.callscreen) .system-navigation { background:#101114; color:#fff; }
-.recent-apps { padding:20px; gap:12px; background:#e8eef4; color:#222; }
-.recent-apps h2 { font-size:20px; margin:0 0 8px; }
-.recent-app-card { display:flex; align-items:center; gap:12px; padding:18px; min-height:76px; background:#fff; color:#222; border:0; border-radius:20px; cursor:pointer; text-align:left; }
-.recent-app-card span { margin-left:auto; font-size:12px; color:#687583; }
+.recent-apps { padding:16px 0 12px; gap:12px; background:radial-gradient(ellipse at 50% 15%,#d9e8ee,#e9eef3); color:#222; overflow:hidden; }
+.recent-apps h2 { flex:none; padding:0 18px; font-size:17px; margin:0; }
+.recent-empty { margin:auto; padding:20px; color:#586675; }
+.recent-track { display:flex; flex:1; min-height:0; gap:12px; padding:2px 12% 6px; overflow-x:auto; overflow-y:hidden; scroll-snap-type:x mandatory; scroll-padding-inline:12%; overscroll-behavior-x:contain; touch-action:pan-x; scrollbar-width:none; }
+.recent-track::-webkit-scrollbar { display:none; }
+.recent-app-card { position:relative; flex:0 0 100%; min-width:0; min-height:0; display:flex; flex-direction:column; gap:7px; scroll-snap-align:start; }
+.recent-card-label { display:flex; flex:none; justify-content:center; align-items:center; gap:7px; font-size:12px; }
+.recent-app-icon { display:grid; place-items:center; flex:none; width:26px; height:26px; border-radius:7px; color:#fff; overflow:hidden; }
+.recent-app-icon:has(.brand-art) { background:transparent; }
+.recent-app-icon > img,.recent-app-icon > svg { display:block; width:100%; height:100%; max-width:26px; max-height:26px; object-fit:contain; }
+.recent-app-icon > svg { padding:3px; }
+.recent-thumbnail { flex:1; min-height:0; position:relative; overflow:hidden; border-radius:18px; background:#f5f6f8; box-shadow:0 3px 9px #182b3825; pointer-events:none; }
+.recent-thumbnail > .view { width:142.857%; height:142.857%; transform:scale(.7); transform-origin:top left; overflow:hidden; }
+.recent-hit { position:absolute; inset:0; border:0; border-radius:18px; background:transparent; cursor:pointer; touch-action:pan-x; }
+.recent-hit:focus-visible { outline-offset:-2px; }
+.recent-clear { flex:none; align-self:center; min-height:40px; border:0; border-radius:999px; padding:8px 20px; background:#ffffffde; color:#222; font-size:13px; font-weight:700; cursor:pointer; }
 .home { background:radial-gradient(ellipse at 20% 0,#e0eaf4,transparent 65%),#eff3f7; padding:12px 20px; gap:15px; }
 .home .grid,.home .memo,.home .dock { flex:none; }
 .home .grid { gap:17px 10px; }

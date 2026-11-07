@@ -8,6 +8,15 @@ function engine() {
   class Node {
     constructor(tag) { this.tag = tag; this.children = []; this.attrs = {}; this.style = {}; this.textContent = ''; this.classList = { add: (...names) => { this.className += ' ' + names.join(' '); } }; }
     appendChild(n) { this.children.push(n); n.parentNode = this; return n; }
+    cloneNode(deep) {
+      const copy=new Node(this.tag);copy.className=this.className;copy.textContent=this.textContent;copy.attrs={...this.attrs};
+      if(deep)this.children.forEach(child=>copy.appendChild(child.cloneNode ? child.cloneNode(true) : {...child}));
+      return copy;
+    }
+    querySelectorAll(selector) {
+      const names=selector.split(',').map(s=>s.trim().slice(1,-1));
+      return allNodes(this).slice(1).filter(node=>names.some(name=>Object.hasOwn(node.attrs||{},name)));
+    }
     get firstChild() { return this.children[0]; }
     remove() { if (this.parentNode) this.parentNode.children = this.parentNode.children.filter(n => n !== this); }
     replaceChildren(...kids) { this.children = kids; }
@@ -622,4 +631,22 @@ test('전체 화면은 버튼으로 열고 결과로 이동하면 해제한다',
 test('전체 화면을 지원하지 않는 iPhone에는 웹 앱으로 여는 방법을 안내한다', () => {
   const e=engine(),{MK,root}=e;e.setDevice(true,5,'iPhone');MK.UI.phone=e.PhoneUI;MK.prepare('phone');act(root,'start');act(root,'fullscreen');
   assert.ok(textOf(root).includes('홈 화면에 추가 → 웹 앱으로 열기'));assert.equal(MK.S.ended,false);
+});
+
+
+test('PC 문서 미리보기는 내용 클릭과 바깥 클릭을 구분한다', () => {
+  const {MK,PCUI,root}=engine();MK.ui=PCUI;PCUI.mount();MK.S.running=true;PCUI.render();act(root,'desk-doc');
+  const layer=findNode(root,n=>n.className==='modal-back'),viewer=findNode(layer,n=>n.className==='modal viewer');
+  layer.click({target:viewer,currentTarget:layer});assert.ok(findNode(root,n=>n.className==='modal viewer'));
+  layer.click({target:layer,currentTarget:layer});assert.ok(!findNode(root,n=>n.className==='modal viewer'));
+});
+
+test('최근 앱 카드는 마지막 화면을 담고 위로 밀기와 모두 닫기를 지원한다', () => {
+  const {MK,root}=phoneEngine();act(root,'app-mail');act(root,'home');act(root,'app-bank');act(root,'recents');
+  assert.equal(allNodes(root).filter(n=>n.className==='recent-thumbnail').length,2);
+  const preview=findNode(root,n=>n.className==='recent-thumbnail');assert.ok(Object.hasOwn(preview.children[0].attrs,'inert'));
+  const bank=findNode(root,n=>n.attrs&&n.attrs['data-act']==='recent-bank');
+  bank.pointerdown({clientX:70,clientY:140});bank.pointerup({clientX:72,clientY:55});
+  assert.ok(!findNode(root,n=>n.attrs&&n.attrs['data-act']==='recent-bank'));
+  act(root,'recent-clear');assert.equal(MK.S.route.name,'home');act(root,'recents');assert.ok(textOf(root).includes('최근 사용한 앱이 없어요'));
 });

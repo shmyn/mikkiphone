@@ -506,7 +506,9 @@
         el("div", { cls: "win-title" }, el("span", { text: f.name }), iconBtn("win-close", "close", "닫기", function () { P.modal = null; render(true); }, "close", 16)),
         f.type === "img" ? el("img", { cls: "photo big", attrs: { src: f.src || "assets/photos/friends.jpg", alt: f.name } }) : docPage(f));
     }
-    return el("div", { cls: "modal-back" }, box);
+    return el("div", { cls: "modal-back", onClick: m.kind === "view" ? function (event) {
+      if (event.target === event.currentTarget && P.modal === m) { P.modal = null; render(true); }
+    } : null }, box);
   }
   function docPage(f) {
     var d = MK.D.DOCS[f.name] || { title: f.name.replace(/\.[a-z]+$/, ""), meta: "", lines: ["내용을 불러왔어요."] };
