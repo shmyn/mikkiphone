@@ -403,7 +403,8 @@
     "replies": [
       [
         {
-          "label": "잘 받았습니다. 검토 후 회신드리겠습니다.",
+          "label": "견적서 검토 후 회신 드립니다. 안내해주신 조건 확인했습니다.",
+          "ifTaskStep": "quote_read",
           "effect": "handled",
           "taskStep": "quote_reply"
         }

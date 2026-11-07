@@ -315,14 +315,16 @@ test('체크카드 내역은 아직 오지 않은 결제를 미리 보여주지 
   assert.equal(MK.S.tasks.t4,true);assert.equal(MK.S.st.s8.verify,true);
 });
 
-test('새 메일을 받은 뒤에도 이전 견적서에 명시적으로 답장하고 첨부 확인까지 해야 완료된다', () => {
+test('견적서를 열어 확인한 뒤에만 이전 메일에 검토 회신을 보낼 수 있다', () => {
   const {MK,PCUI,root}=engine();
   MK.deliver(MK.ITEM.Lp2);MK.deliver(MK.ITEM.Lp11);
   MK.ui=PCUI;PCUI.mount();MK.S.running=true;PCUI.render();
   act(root,'desk-mail');act(root,'open-pm_partner');act(root,'reply-to-Lp2');
   assert.ok(textOf(root).includes('답장 대상: 11월 견적서 송부드립니다'));
-  act(root,'reply');assert.equal(MK.S.tasks.t1,undefined);
-  act(root,'att-open');assert.equal(MK.S.tasks.t1,true);
+  assert.ok(!textOf(root).includes('검토 후 회신 드립니다'));
+  act(root,'att-open');assert.equal(MK.S.tasks.t1,undefined);
+  assert.ok(textOf(root).includes('검토 후 회신 드립니다'));
+  act(root,'reply');assert.equal(MK.S.tasks.t1,true);
 });
 
 test('이전 답장 뒤에 새 연락이 오면 대화 목록 미리보기도 새 연락을 가리킨다', () => {

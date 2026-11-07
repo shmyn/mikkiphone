@@ -342,6 +342,7 @@
   MK.choiceAvailable = function (choice) {
     return (!choice.ifArrived || !!MK.S.delivered[choice.ifArrived]) &&
       (!choice.ifOpened || !!(MK.S.delivered[choice.ifOpened] && MK.S.st[choice.ifOpened].opened)) &&
+      (!choice.ifTaskStep || !!MK.S.taskSteps[choice.ifTaskStep]) &&
       (!choice.ifAsked || !!MK.S.askUsed[choice.ifAsked]);
   };
   MK.replyChips = function (threadId, replyItemId) {
