@@ -84,7 +84,7 @@
         btn("modebtn", experienceNames.phone, function () { MK.prepare("phone"); }, "mode-phone"),
         mobile ? null : btn("modebtn", experienceNames.pc, function () { MK.prepare("pc"); }, "mode-pc")),
       el("footer", { cls: "intro-footer" },
-        el("p", { text: "약 5분 · 가상 체험" }),
+        el("p", { text: "약 3~5분 · 가상 체험" }),
         mobile ? el("p", { text: "컴퓨터에서 접속하면 회사 PC 업무 체험도 할 수 있어요" }) : null,
         el("p", { cls: "copyright", text: "© 2026 KARGI. All rights reserved." })));
     MK.root.replaceChildren(card);
