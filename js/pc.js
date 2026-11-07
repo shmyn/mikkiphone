@@ -17,7 +17,9 @@
     deskEl = el("div", { cls: "desk" });
     toastEl = el("div", { cls: "toasts", attrs: { "aria-live": "polite" } });
     screenEl = el("div", { cls: "pc-screen" }, deskEl, toastEl);
-    MK.root.replaceChildren(el("div", { cls: "pc" }, screenEl, el("div", { cls: "pc-chin", attrs: { "aria-hidden": "true" } })));
+    MK.root.replaceChildren(el("div", { cls: "pc" }, screenEl, el("div", { cls: "pc-chin", attrs: { "aria-hidden": "true" } })),
+      el("div", { cls: "rotate-notice", attrs: { role: "status" } },
+        el("strong", { text: "가로로 돌려주세요" }), el("p", { text: "휴대폰의 PC 모드는 가로 화면에서 플레이할 수 있어요" })));
     lock();
   };
 

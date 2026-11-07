@@ -612,3 +612,14 @@ body.mode-pc .stage { display:block; min-width:0; width:100%; padding:16px; }
   .tray { gap:5px; }
   .pc-gallery-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
 }
+
+/* Preserve the desktop split panes when the PC simulation runs on a landscape phone. */
+@media (hover: none) and (pointer: coarse) and (orientation: landscape) {
+  body.mode-pc .win { top:8px; left:82px; right:220px; bottom:48px; border-radius:7px; }
+  body.mode-pc .win .panes { grid-template-columns:minmax(135px,30%) minmax(0,1fr); grid-template-rows:1fr; }
+  body.mode-pc .pane-list { border-right:1px solid var(--bubble-in); border-bottom:0; }
+  body.mode-pc .pane-list.folders { display:block; }
+  body.mode-pc .pcmemo { width:200px; }
+  body.mode-pc .desk-icon { width:64px; height:60px; font-size:10px; }
+  body.mode-pc .desk-icons { gap:2px; }
+}

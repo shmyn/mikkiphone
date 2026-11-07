@@ -67,11 +67,13 @@
       el("div", { cls: "bobber", attrs: { "aria-hidden": "true" } }),
       el("h1", { cls: "wordmark", text: "미끼폰" }),
       el("p", { cls: "lede", text: "나는 어떻게 낚이는 사람일까" }),
+      el("p", { cls: "intro-purpose", text: "일상에서 마주칠 수 있는 피싱 위험에 대한 내 취약점을 진단하는 시뮬레이션" }),
+      el("p", { cls: "intro-instruction", text: "평소처럼 일상생활을 수행해보세요" }),
       el("div", { cls: "modes" },
-        btn("modebtn", "휴대폰 시작", function () { MK.prepare("phone"); }, "mode-phone"),
+        btn("modebtn", "휴대폰 시작 · 3분", function () { MK.prepare("phone"); }, "mode-phone"),
         btn("modebtn", "PC 시작", function () { MK.prepare("pc"); }, "mode-pc")),
-      el("p", { cls: "fineprint", text: "진행 중 언제든 끝내고 결과 확인 가능" }),
-      el("p", { cls: "fineprint", text: "비공식 포트폴리오 · 가상 대화 · 실제 설치·전송 없음" }));
+      el("p", { cls: "fineprint", text: "가상 대화 · 실제 설치·전송 없음 · 진행 중 언제든 끝내고 결과 확인 가능" }),
+      el("p", { cls: "copyright", text: "© 2026 KARGI. All rights reserved." }));
     MK.root.replaceChildren(card);
     focusView(card);
   };
@@ -88,10 +90,11 @@
       delivered: {}, order: [], st: {}, unread: {}, tasks: {}, taskSteps: {}, deletedThreads: {}, askUsed: {}, timeline: {}, pending: {}, sequence: 0,
       route: null, stack: [], ended: false, dnd: false, schedule: {}
     };
-    // 짧은 간격으로 몰리는 연락은 순서를 유지하며 최소 18초씩 띄운다.
-    var lastArrival = -18;
+    // 모드별 시간표 간격을 보장한다. 폰은 주요 피싱 사이에 일반 연락을 배치한다.
+    var gap = MK.D.EVENT_GAP_SEC || 18;
+    var lastArrival = -gap;
     MK.D.ITEMS.filter(function (it) { return it.at != null; }).sort(function (a, b) { return a.at - b.at; }).forEach(function (it) {
-      lastArrival = Math.max(it.at, lastArrival + 18);
+      lastArrival = Math.max(it.at, lastArrival + gap);
       S.schedule[it.id] = lastArrival * 1000;
     });
     MK.D.ITEMS.forEach(function (it) {
@@ -114,10 +117,11 @@
   };
   function stopTicker() { if (MK.S && MK.S.ticker) clearInterval(MK.S.ticker); }
 
-  MK.now = function () { var S = MK.S; return S.used + (document.hidden ? 0 : performance.now() - S.last); };
+  MK.orientationBlocked = function () { return MK.dev === "pc" && window.matchMedia && window.matchMedia("(hover: none) and (pointer: coarse) and (orientation: portrait)").matches; };
+  MK.now = function () { var S = MK.S; return S.used + (document.hidden || MK.orientationBlocked() ? 0 : performance.now() - S.last); };
   function tick() {
     var S = MK.S, p = performance.now();
-    if (!document.hidden) S.used += p - S.last;
+    if (!document.hidden && !MK.orientationBlocked()) S.used += p - S.last;
     S.last = p;
     var t = S.used;
     MK.D.ITEMS.forEach(function (it) {

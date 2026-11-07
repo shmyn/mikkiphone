@@ -537,3 +537,13 @@ a.modebtn { text-decoration: none; }
   body.mode-pc .stage:has(.session-toolbar) .pc { flex: 1; min-height: 0; }
   body.mode-pc .stage:has(.session-toolbar) .pc-screen { height: 100%; }
 }
+
+.intro-purpose { font-size:15px; line-height:1.7; color:#c8d2d8; margin:0 0 18px; }
+.intro-instruction { font-size:16px; margin:0 0 18px; }
+.copyright { color:#aab6bd; font-size:11px; margin:18px 0 0; }
+.rotate-notice { display:none; }
+@media (hover: none) and (pointer: coarse) and (orientation: portrait) {
+  body.mode-pc .rotate-notice { position:fixed; inset:0; z-index:100; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:28px; background:#303030; color:#fff; text-align:center; }
+  .rotate-notice strong { font-size:25px; }
+  .rotate-notice p { max-width:280px; line-height:1.7; color:#d0d5da; }
+}

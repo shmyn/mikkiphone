@@ -47,7 +47,7 @@ function engine() {
   const PhoneUI = MK.UI.phone;
   MK.UI.pc = { mount() {}, onDeliver() {}, render() {}, refreshThread() {} };
   MK.prepare('pc');
-  return { MK, PCUI, PhoneUI, root, timers, captures, tick(ms) { clock.value += ms; ticker(); }, advance(ms) { clock.value+=ms; if(MK.ui.tick) MK.ui.tick(MK.now()); }, flush() { timers.splice(0).sort((a,b) => a.at-b.at).forEach(t => t.fn()); } };
+  return { MK, PCUI, PhoneUI, root, timers, captures, setPortraitPhone(value) { context.window.matchMedia = () => ({ matches:value }); }, tick(ms) { clock.value += ms; ticker(); }, advance(ms) { clock.value+=ms; if(MK.ui.tick) MK.ui.tick(MK.now()); }, flush() { timers.splice(0).sort((a,b) => a.at-b.at).forEach(t => t.fn()); } };
 }
 
 test('메일 요청 → 상대 답장 → 첨부 메일 순서를 유지하고 지난 답장을 되살리지 않는다', () => {
@@ -465,14 +465,14 @@ for (const dev of ['phone','pc']) {
   });
 }
 
-test('예약 알림은 원래 순서를 유지하고 최소 18초 간격으로 도착한다', () => {
+test('예약 알림은 모드별 간격과 종료 시간을 지킨다', () => {
   const {MK}=engine();
   for(const dev of ['phone','pc']) {
     MK.prepare(dev);
     const arrivals=MK.D.ITEMS.filter(it=>it.at!=null).sort((a,b)=>a.at-b.at);
     arrivals.forEach((it,i)=>{
       assert.ok(MK.S.schedule[it.id]>=it.at*1000);
-      if(i)assert.ok(MK.S.schedule[it.id]-MK.S.schedule[arrivals[i-1].id]>=18000);
+      if(i)assert.ok(MK.S.schedule[it.id]-MK.S.schedule[arrivals[i-1].id]>=(MK.D.EVENT_GAP_SEC||18)*1000);
     });
     assert.ok(MK.S.schedule[arrivals.at(-1).id]<MK.D.SESSION_END_SEC*1000);
   }
@@ -488,4 +488,28 @@ test('미션 전에 일반·피싱 전화와 PC 경고창을 먼저 배치한다
   MK.prepare('pc');
   assert.ok(MK.S.schedule.P4<MK.S.schedule.Lp2);
   assert.ok(MK.S.schedule.Lp4<MK.S.schedule.Lp2);
+});
+
+
+test('휴대폰은 3분 안에 핵심 이벤트가 도착하고 피싱 사이는 18초 이상 확보한다', () => {
+  const {MK}=engine();MK.prepare('phone');assert.equal(MK.D.SESSION_END_SEC,180);
+  const phish=MK.D.ITEMS.filter(it=>it.kind==='phish' && it.at!=null).sort((a,b)=>a.at-b.at);
+  assert.equal(phish.length,8);
+  phish.forEach((it,i)=>{if(i)assert.ok(MK.S.schedule[it.id]-MK.S.schedule[phish[i-1].id]>=18000);});
+  assert.ok(MK.S.schedule.s8<=164000);
+  assert.ok(MK.D.ITEMS.filter(it=>it.kind==='ambient').every(it=>it.at===null));
+});
+
+
+test('모바일 PC 모드를 세로로 돌린 동안에는 세션 시간을 멈춘다', () => {
+  const e=engine(),{MK}=e;MK.begin();e.tick(1000);assert.equal(MK.S.used,1000);
+  e.setPortraitPhone(true);e.tick(20000);assert.equal(MK.S.used,1000);
+  assert.equal(MK.now(),1000);
+  e.setPortraitPhone(false);e.tick(1000);assert.equal(MK.S.used,2000);
+});
+
+test('휴대폰 시작 후 미션 답장보다 일반 전화와 사칭 전화가 먼저 도착한다', () => {
+  const e=engine(),{MK,root}=e;MK.UI.phone=e.PhoneUI;MK.prepare('phone');act(root,'start');
+  e.tick(2000);assert.equal(MK.S.delivered.L5,true);assert.equal(MK.S.delivered.L1,undefined);
+  e.tick(16000);e.tick(6000);assert.equal(MK.S.delivered.s4,true);assert.equal(MK.S.delivered.L1,undefined);
 });

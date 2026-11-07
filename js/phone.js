@@ -50,7 +50,7 @@
     if (it.channel === "task") {
       MK.S.tasks.t4visible = true;
       banner("메모", "메모", it.body, function () { go({ name: "home" }, true); });
-    } else {
+    } else if (!it.quiet) {
       var th = it.thread ? MK.D.THREADS[it.thread] : null;
       var app = th ? th.app : it.app;
       banner(app, it.subject || (th ? th.name : it.sender), MK.cleanText(it.body), function () { openItem(it); });
