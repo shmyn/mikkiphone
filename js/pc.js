@@ -13,7 +13,7 @@
     P = { app: null, max: false, replyTo: null, chatTab: "chats", chatUnread: false, chatMenu: false, galleryFilter: "all", chatScroll: {}, sel: { mail: null, chat: null }, folder: "다운로드", zip: null,
       browser: { page: null, item: null, stack: [], clickfix: null, done: {}, dl: null, shopTab: "home", companyTab: "home" },
       files: MK.D.FILES["다운로드"].map(function (f) { return { name: f.name, type: f.type }; }),
-      modal: null, popup: null, notifs: [], center: false, start: false, dnd: false };
+      modal: null, popup: null, pendingPopup: null, notifs: [], center: false, start: false, dnd: false };
     deskEl = el("div", { cls: "desk" });
     toastEl = el("div", { cls: "toasts", attrs: { "aria-live": "polite" } });
     screenEl = el("div", { cls: "pc-screen" }, deskEl, toastEl);
@@ -36,9 +36,8 @@
   }
 
   // ---------- 엔진 연결 ----------
-  UI.canDeliver = function (it) { return it.channel !== "popup" || (P.app === "browser" && !P.modal && !P.popup); };
   UI.onDeliver = function (it) {
-    if (it.channel === "popup") { P.popup = { item: it, stage: 0 }; MK.markOpened(it); render(); return; }
+    if (it.channel === "popup") { P.pendingPopup = it; render(); return; }
     if (it.channel === "page") return;
     var th = it.thread ? MK.D.THREADS[it.thread] : null;
     var app = th ? th.app : "system";
@@ -78,6 +77,9 @@
   // ---------- 그리기 ----------
   function render(moved) {
     if (!MK.S || MK.S.ended || !MK.S.running) return;
+    if (P.pendingPopup && P.app === "browser" && !P.modal && !P.popup) {
+      P.popup = { item: P.pendingPopup, stage: 0 }; MK.markOpened(P.pendingPopup); P.pendingPopup = null;
+    }
     var kids = [desktop()];
     if (P.app) kids.push(windowView());
     if (P.start) kids.push(startMenu());
@@ -104,7 +106,7 @@
     icons.appendChild(el("button", { cls: "desk-icon", attrs: { "data-act": "desk-doc" }, onClick: function () { P.modal = { kind: "view", file: { name: "주간보고_11월2주.docx", type: "doc" } }; render(true); } },
       el("i", { cls: "app-doc" }, icon("file", 34, true)), el("span", { text: "주간보고_11월2주" })));
     var memo = el("div", { cls: "memo pcmemo" }, el("div", { cls: "memo-h", text: "오늘 할 일" }));
-    MK.D.TASKS.forEach(function (t) {
+    MK.visibleTasks().forEach(function (t) {
       memo.appendChild(el("div", { cls: "task" + (S.tasks[t.id] ? " done" : "") }, el("span", { cls: "box", attrs: { "aria-hidden": "true" } }), el("span", { text: t.text })));
     });
     return el("div", { cls: "desktop" }, icons, memo);

@@ -14,7 +14,10 @@ function engine() {
     setAttribute(k, v) { this.attrs[k] = v; }
     addEventListener(type, run) { this[type] = run; }
     focus() {}
-    querySelector() { return null; }
+    querySelector(selector) {
+      const parts=selector.split(',').map(s=>s.trim());
+      return allNodes(this).slice(1).find(n=>parts.some(s=>s[0]==='.' ? (n.className||'').split(/\s+/).includes(s.slice(1)) : n.tag===s)) || null;
+    }
     get rows() { return this.children.filter(n => n.tag === "tr"); }
   }
   const root = new Node('main');
@@ -486,7 +489,7 @@ test('피싱은 정상 연락의 맥락을 만든 뒤에 배치하고 PC 경고�
   assert.ok(MK.S.schedule.s8<MK.S.schedule.L1);
   MK.prepare('pc');
   for(const [normal,fake] of [['Lp2','P2'],['Lp3','P3'],['Lp6','P5'],['Lp7','P7'],['Lp9','P8']])assert.ok(MK.S.schedule[normal]<MK.S.schedule[fake]);
-  assert.ok(MK.S.schedule.P4>=240000);
+  assert.ok(MK.S.schedule.P4>=MK.D.SESSION_END_SEC*0.8*1000);
 });
 
 
@@ -531,8 +534,33 @@ test('추가 일상 미션은 단톡방 답장과 가족 통화 선택에 연결
 
 test('PC 감염 팝업은 브라우저를 사용할 때만 나오며 업데이트 미션은 읽기와 실제 예약을 요구한다', () => {
   const {MK,PCUI,root}=engine();MK.ui=PCUI;PCUI.mount();MK.S.running=true;PCUI.render();
-  assert.equal(PCUI.canDeliver(MK.ITEM.P4),false);act(root,'desk-browser');assert.equal(PCUI.canDeliver(MK.ITEM.P4),true);
+  MK.deliver(MK.ITEM.P4);assert.equal(MK.S.delivered.P4,true);assert.equal(MK.S.st.P4.opened,false);
+  assert.ok(!findNode(root,n=>n.className==='scam-popup'));act(root,'desk-browser');assert.equal(MK.S.st.P4.opened,true);
+  act(root,'popup-close');
   MK.deliver(MK.ITEM.Lp3);MK.markOpened(MK.ITEM.Lp3);assert.equal(MK.S.tasks.t5,undefined);
   MK.deliver(MK.ITEM.Lp4);act(root,'tb-settings');act(root,'update');assert.equal(MK.S.tasks.t5,true);
   act(root,'tb-calendar');act(root,'calendar-confirm');assert.equal(MK.S.tasks.t4,true);
 });
+
+
+for(const dev of ['phone','pc']) {
+  test(dev+' 메모는 처음 한 개이며 15초마다 공개하고 연락 전에는 해당 미션을 숨긴다', () => {
+    const e=engine(),{MK}=e;MK.UI[dev]=dev==='phone'?e.PhoneUI:e.PCUI;MK.prepare(dev);
+    act(e.root,'start');assert.equal(MK.visibleTasks().length,1);
+    e.tick(14750);assert.equal(MK.visibleTasks().length,1);e.tick(250);assert.equal(MK.visibleTasks().length,2);
+    if(dev==='phone'){
+      assert.ok(!MK.visibleTasks().some(t=>t.id==='t1'));assert.ok(!textOf(e.root).includes('연락 대기'));
+    }
+    const nav=findNode(e.root,n=>n.className==='system-navigation');
+    if(nav)assert.ok(nav.children.every(button=>textOf(button)===''));
+  });
+  test(dev+' 전체 세션을 250ms씩 진행하면 모든 예약 이벤트가 제한 시간 안에 도착한다', () => {
+    const e=engine(),{MK}=e;MK.UI[dev]=dev==='phone'?e.PhoneUI:e.PCUI;MK.prepare(dev);act(e.root,'start');
+    const scheduled=MK.D.ITEMS.filter(it=>it.at!=null).map(it=>it.id);
+    assert.equal(MK.D.SESSION_END_SEC,dev==='phone'?180:240);
+    for(let elapsed=0;elapsed<MK.D.SESSION_END_SEC*1000;elapsed+=250)e.tick(250);
+    assert.equal(MK.S.ended,true);
+    assert.deepEqual(scheduled.filter(id=>!MK.S.delivered[id]),[]);
+    assert.equal(MK.S.taskOrder.length,MK.D.TASKS.length);
+  });
+}

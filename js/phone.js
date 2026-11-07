@@ -90,7 +90,7 @@
     var nav = el("nav", { cls: "system-navigation", attrs: { "aria-label": "휴대폰 탐색 버튼" } });
     [["recents", "최근 앱", function () { go({ name: "recents" }); }], ["home", "홈", home], ["system-back", "뒤로", back]].forEach(function (spec) {
       nav.appendChild(el("button", { cls: "system-nav-button", attrs: { "aria-label": spec[1], "data-act": spec[0] }, onClick: function () { if (MK.S.running) spec[2](); } },
-        el("span", { cls: "system-glyph glyph-" + spec[0], attrs: { "aria-hidden": "true" } }), el("span", { text: spec[1] })));
+        el("span", { cls: "system-glyph glyph-" + spec[0], attrs: { "aria-hidden": "true" } })));
     });
     return nav;
   }
@@ -179,7 +179,7 @@
     var n = unread(a);
     return el("button", { cls: "icon", attrs: { "data-act": "app-" + a, "aria-label": APPS[a] + (n ? ", 읽지 않음 " + n : "") }, onClick: function () { openApp(a); } },
       el("i", { cls: "app-" + a }, icon(a, 36, true), n ? el("b", { cls: "badge", text: String(n) }) : null),
-      el("span", { text: APPS[a] }));
+      el("span", { text: a === "map" ? "지도" : (a === "blog" ? "블로그" : APPS[a]) }));
   }
   function openApp(a) {
     if (a === "phone") P.recent.forEach(function (c) { c.seen = true; });
@@ -188,13 +188,10 @@
   function homeView() {
     var S = MK.S;
     var memo = el("div", { cls: "memo" }, el("div", { cls: "memo-h", text: "오늘 할 일" }));
-    MK.D.TASKS.forEach(function (t) {
-      if (t.appearsWith && !S.delivered[t.appearsWith]) return;
+    MK.visibleTasks().forEach(function (t) {
       memo.appendChild(el("div", { cls: "task" + (S.tasks[t.id] ? " done" : "") },
-        el("span", { cls: "box", attrs: { "aria-hidden": "true" } }), el("span", { text: t.text }),
-        t.waitsFor && !S.delivered[t.waitsFor] ? el("small", { cls: "task-wait", text: "연락 대기" }) : null));
+        el("span", { cls: "box", attrs: { "aria-hidden": "true" } }), el("span", { text: t.text })));
     });
-    if (S.tasks.t4visible) memo.appendChild(el("p", { cls: "memo-note", text: MK.ITEM.s8.body }));
     var grid = el("div", { cls: "grid" });
     ["mail", "moamall", "bank", "camera", "photos", "map", "settings", "x", "blog"].forEach(function (a) { grid.appendChild(appIcon(a)); });
     var dock = el("div", { cls: "dock" });

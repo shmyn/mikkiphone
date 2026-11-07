@@ -370,7 +370,7 @@
   {
     "id": "Lp2",
     "kind": "legit",
-    "at": 16,
+    "at": 14,
     "title": "거래처 견적서 메일",
     "channel": "mail",
     "thread": "pm_partner",
@@ -398,7 +398,7 @@
     "kind": "phish",
     "verified": true,
     "source": "기업 담당자 대상 압축 파일 속 바로가기 실행 스피어피싱(탐색 주간 보도)",
-    "at": 34,
+    "at": 28,
     "title": "견적서 수정본 압축 파일",
     "channel": "mail",
     "thread": "pm_p2",
@@ -432,7 +432,7 @@
   {
     "id": "Ap1",
     "kind": "ambient",
-    "at": 50,
+    "at": 38,
     "channel": "mail",
     "thread": "pm_letter",
     "subject": "일요일에 읽고 싶은 다섯 페이지",
@@ -441,7 +441,7 @@
   {
     "id": "Lp5",
     "kind": "legit",
-    "at": 58,
+    "at": 48,
     "title": "동료 점심 메시지",
     "channel": "chat",
     "thread": "pc_kim",
@@ -470,7 +470,7 @@
     "kind": "phish",
     "verified": true,
     "source": "KISA ‘개인정보 유출 보상금’ 미끼 경고",
-    "at": 76,
+    "at": 70,
     "title": "보상금 조회 프로그램 메일",
     "channel": "mail",
     "thread": "pm_p6",
@@ -497,7 +497,7 @@
   {
     "id": "Lp3",
     "kind": "legit",
-    "at": 92,
+    "at": 82,
     "title": "IT지원팀 보안 공지",
     "channel": "mail",
     "thread": "pm_it",
@@ -509,7 +509,7 @@
     "id": "P3",
     "kind": "phish",
     "verified": false,
-    "at": 110,
+    "at": 96,
     "title": "IT팀 사칭 설치 파일",
     "channel": "mail",
     "thread": "pm_p3",
@@ -537,7 +537,7 @@
   {
     "id": "Lp6",
     "kind": "legit",
-    "at": 128,
+    "at": 108,
     "title": "지수 주말 사진",
     "channel": "chat",
     "thread": "pc_jisu",
@@ -560,7 +560,7 @@
     "id": "P5",
     "kind": "phish",
     "verified": false,
-    "at": 146,
+    "at": 122,
     "title": "지인 새 계정 사진 링크",
     "channel": "chat",
     "thread": "pc_p5",
@@ -585,7 +585,7 @@
   {
     "id": "Lp4",
     "kind": "legit",
-    "at": 164,
+    "at": 136,
     "title": "시스템 업데이트 알림",
     "channel": "toast",
     "source": "시스템",
@@ -602,7 +602,7 @@
   {
     "id": "Ap2",
     "kind": "ambient",
-    "at": 190,
+    "at": 170,
     "channel": "chat",
     "thread": "pc_group",
     "body": "오늘 15시~16시 엘리베이터 점검 있습니다."
@@ -611,7 +611,7 @@
     "id": "P7",
     "kind": "phish",
     "verified": false,
-    "at": 182,
+    "at": 160,
     "title": "팀장 사칭 상품권 요청",
     "channel": "mail",
     "thread": "pm_p7",
@@ -660,7 +660,7 @@
   {
     "id": "Lp9",
     "kind": "legit",
-    "at": 200,
+    "at": 180,
     "title": "인사팀 연말정산 안내",
     "channel": "mail",
     "thread": "pm_hr",
@@ -671,7 +671,7 @@
     "id": "P8",
     "kind": "phish",
     "verified": false,
-    "at": 218,
+    "at": 194,
     "title": "인사 문서 열람 로그인",
     "channel": "mail",
     "thread": "pm_p8",
@@ -698,7 +698,7 @@
   {
     "id": "Lp8",
     "kind": "legit",
-    "at": 236,
+    "at": 204,
     "title": "쿠팡 출고 메일",
     "channel": "mail",
     "thread": "pm_moamall",
@@ -709,7 +709,7 @@
     "id": "P4",
     "kind": "phish",
     "verified": false,
-    "at": 260,
+    "at": 216,
     "title": "가짜 감염 경고창",
     "channel": "popup",
     "popup": {
@@ -736,7 +736,7 @@
   {
     "id": "Lp7",
     "kind": "legit",
-    "at": 174,
+    "at": 148,
     "title": "회의 일정 알림",
     "channel": "toast",
     "source": "캘린더",
@@ -788,7 +788,7 @@
   {
     "id": "Ap3",
     "kind": "ambient",
-    "at": 64,
+    "at": 58,
     "channel": "chat",
     "thread": "pc_yuna",
     "body": "하늘님 탕비실에 간식 들어왔대요. 나중에 오실 때 커피 한 잔 하실래요?",
@@ -1075,10 +1075,10 @@
   }
 ];
 
-  var SESSION_END_SEC = 400;
+  var SESSION_END_SEC = 240;
+  var EVENT_GAP_SEC = 10;
 
-  var END_ENABLED_SEC = 245;
   function deepFreeze(o){ Object.getOwnPropertyNames(o).forEach(function(k){var v=o[k];if(v&&typeof v==="object")deepFreeze(v);});return Object.freeze(o); }
-  var DATA = deepFreeze({THREADS:THREADS, ITEMS:ITEMS, PAGES:PAGES, BOOKMARKS:BOOKMARKS, FILES:FILES, DOCS:DOCS, TASKS:TASKS, SESSION_END_SEC:SESSION_END_SEC, END_ENABLED_SEC:END_ENABLED_SEC});
+  var DATA = deepFreeze({THREADS:THREADS, ITEMS:ITEMS, PAGES:PAGES, BOOKMARKS:BOOKMARKS, FILES:FILES, DOCS:DOCS, TASKS:TASKS, SESSION_END_SEC:SESSION_END_SEC, EVENT_GAP_SEC:EVENT_GAP_SEC});
   if(typeof module!=="undefined" && module.exports)module.exports=DATA;else root.MK_PC=DATA;
 })(this);

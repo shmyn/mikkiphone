@@ -641,5 +641,36 @@ body.mode-pc .stage { display:block; min-width:0; width:100%; padding:16px; }
 .galaxy-phone .home .icon { font-size:12px; }
 .galaxy-phone .dock .icon span { display:block; font-size:11px; }
 .galaxy-phone .dock { border-radius:22px; }
-.task-wait { flex:none; margin-left:auto; padding-top:2px; color:#85764b; font-size:10px; white-space:nowrap; }
 @media(max-width:820px) { body.mode-phone .galaxy-phone { padding:0; border-radius:0; } body.mode-phone .galaxy-phone .screen { border-radius:0; } }
+
+/* The entire phone home fits the viewport, including the fully revealed memo. */
+.galaxy-phone .system-navigation { min-height:44px; padding:2px 16px max(2px,env(safe-area-inset-bottom)); }
+.galaxy-phone .system-nav-button { min-height:40px; gap:0; }
+.galaxy-phone .home { overflow:hidden; padding:10px 14px; gap:10px; }
+.galaxy-phone .home .memo { padding:10px 12px; }
+.galaxy-phone .home .memo-h { margin-bottom:6px; }
+.galaxy-phone .home .task { padding:2px 0; line-height:1.45; gap:8px; }
+.galaxy-phone .home .grid { grid-template-columns:repeat(5,minmax(0,1fr)); gap:10px 8px; }
+.galaxy-phone .home .icon { min-width:0; width:100%; gap:4px; }
+.galaxy-phone .home .icon i { width:44px; height:44px; border-radius:13px; }
+.galaxy-phone .home .icon > span { width:100%; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; font-size:11px; line-height:16px; }
+.galaxy-phone .home .dock { padding:6px; }
+@media (max-height:740px) {
+  .galaxy-phone .status { padding:8px 18px 6px; }
+  .galaxy-phone .home { padding:6px 12px; gap:8px; }
+  .galaxy-phone .home .memo { padding:8px 10px; }
+  .galaxy-phone .home .memo-h { margin-bottom:4px; font-size:13px; }
+  .galaxy-phone .home .task { font-size:12.5px; padding:1px 0; line-height:1.3; }
+  .galaxy-phone .home .task .box { width:13px; height:13px; margin-top:2px; }
+  .galaxy-phone .home .grid { gap:8px; }
+  .galaxy-phone .home .icon { gap:3px; }
+  .galaxy-phone .home .icon i { width:40px; height:40px; }
+  .galaxy-phone .home .icon > span { line-height:14px; }
+  .galaxy-phone .home .dock { padding:5px; }
+}
+@media (orientation:landscape) and (max-height:600px) and (min-width:540px) {
+  .galaxy-phone .home { display:grid; grid-template-columns:minmax(190px,1fr) minmax(250px,1.2fr); grid-template-rows:minmax(0,1fr) auto; }
+  .galaxy-phone .home .memo { grid-column:1; grid-row:1/3; align-self:start; }
+  .galaxy-phone .home .grid { grid-column:2; grid-row:1; align-self:center; }
+  .galaxy-phone .home .dock { grid-column:2; grid-row:2; margin-top:0; }
+}

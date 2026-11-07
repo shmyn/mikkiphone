@@ -71,7 +71,7 @@
       el("p", { cls: "intro-instruction", text: "평소처럼 일상생활을 수행해보세요" }),
       el("div", { cls: "modes" },
         btn("modebtn", "휴대폰 시작 · 3분", function () { MK.prepare("phone"); }, "mode-phone"),
-        btn("modebtn", "PC 시작", function () { MK.prepare("pc"); }, "mode-pc")),
+        btn("modebtn", "PC 시작 · 4분", function () { MK.prepare("pc"); }, "mode-pc")),
       el("p", { cls: "fineprint", text: "가상 대화 · 실제 설치·전송 없음 · 진행 중 언제든 끝내고 결과 확인 가능" }),
       el("p", { cls: "copyright", text: "© 2026 KARGI. All rights reserved." }));
     MK.root.replaceChildren(card);
@@ -88,7 +88,7 @@
     var S = MK.S = {
       used: 0, last: performance.now(), ticker: null, running: false,
       delivered: {}, order: [], st: {}, unread: {}, tasks: {}, taskSteps: {}, deletedThreads: {}, askUsed: {}, timeline: {}, pending: {}, sequence: 0,
-      route: null, stack: [], ended: false, dnd: false, schedule: {}
+      route: null, stack: [], ended: false, dnd: false, schedule: {}, visibleTasks: {}, taskOrder: []
     };
     // 모드별 시간표 간격을 보장한다. 폰은 주요 피싱 사이에 일반 연락을 배치한다.
     var gap = MK.D.EVENT_GAP_SEC || 18;
@@ -102,6 +102,7 @@
         verify: false, reported: false, handled: false, blocked: false,
         stage: 0, used: {} };
     });
+    MK.revealTasks(0);
     document.body.className = "mode-" + dev;
     MK.ui.mount();
   };
@@ -130,6 +131,7 @@
       MK.deliver(it);
     });
     if (MK.ui.tick) MK.ui.tick(t);
+    if (MK.revealTasks(t)) MK.ui.render();
     S.progress.setAttribute("value", Math.min(MK.D.SESSION_END_SEC, t / 1000));
     if (t >= MK.D.SESSION_END_SEC * 1000) MK.finish();
   }
@@ -145,6 +147,7 @@
     if (it.thread) delete S.deletedThreads[it.thread];
     if (it.thread || it.channel === "push" || it.channel === "toast") S.unread[it.id] = true;
     MK.ui.onDeliver(it);
+    if (MK.revealTasks(MK.now())) MK.ui.render();
   };
 
   // ---------- 기록 ----------
@@ -178,6 +181,20 @@
     MK.D.TASKS.forEach(function (task) {
       if (task.requires && task.requires.every(function (step) { return MK.S.taskSteps[step]; })) MK.doneTask(task.id);
     });
+  };
+  MK.revealTasks = function (time) {
+    var changed = false, S = MK.S;
+    MK.D.TASKS.forEach(function (task, index) {
+      if (S.visibleTasks[task.id] || time < (task.revealAt != null ? task.revealAt : index * 15) * 1000) return;
+      if ((task.waitsFor && !S.delivered[task.waitsFor]) || (task.appearsWith && !S.delivered[task.appearsWith])) return;
+      S.visibleTasks[task.id] = true;
+      S.taskOrder.push(task.id);
+      changed = true;
+    });
+    return changed;
+  };
+  MK.visibleTasks = function () {
+    return MK.S.taskOrder.map(function (id) { return MK.D.TASKS.filter(function (task) { return task.id === id; })[0]; });
   };
   MK.doneTask = function (id) {
     var t = MK.D.TASKS.filter(function (x) { return x.id === id; })[0];
