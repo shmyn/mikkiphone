@@ -58,6 +58,14 @@
   MK.asset = function (path) { return path; };
   MK.el = el; MK.btn = btn; MK.iconBtn = iconBtn; MK.avatar = avatar; MK.clockText = clockText; MK.focusView = focusView;
 
+  var experienceNames = { phone: "스마트폰 일상 체험", pc: "회사 PC 업무 체험" };
+  function isMobileDevice() {
+    return !!((navigator.userAgentData && navigator.userAgentData.mobile) ||
+      /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent || "") ||
+      (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1) ||
+      (navigator.maxTouchPoints > 0 && window.matchMedia && window.matchMedia("(pointer: coarse)").matches));
+  }
+
   // ---------- 시작 화면 ----------
   MK.home = function () {
     stopTicker();
@@ -65,6 +73,7 @@
     leaveFullscreen();
     MK.S = null;
     document.body.className = "";
+    var mobile = isMobileDevice();
     var card = el("section", { cls: "startcard" },
       el("div", { cls: "bobber", attrs: { "aria-hidden": "true" } }),
       el("h1", { cls: "wordmark", text: "미끼폰" }),
@@ -72,9 +81,10 @@
       el("p", { cls: "intro-purpose", text: "일상에서 마주칠 수 있는 피싱 위험에 대한 내 취약점을 진단하는 시뮬레이션" }),
       el("p", { cls: "intro-instruction", text: "평소처럼 일상생활을 수행해보세요" }),
       el("div", { cls: "modes" },
-        btn("modebtn", "휴대폰 시작 · 약 5분", function () { MK.prepare("phone"); }, "mode-phone"),
-        btn("modebtn", "PC 시작 · 약 5분", function () { MK.prepare("pc"); }, "mode-pc")),
-      el("p", { cls: "fineprint", text: "가상 대화 · 실제 설치·전송 없음 · 진행 중 언제든 끝내고 결과 확인 가능" }),
+        btn("modebtn", experienceNames.phone, function () { MK.prepare("phone"); }, "mode-phone"),
+        mobile ? null : btn("modebtn", experienceNames.pc, function () { MK.prepare("pc"); }, "mode-pc")),
+      mobile ? el("p", { cls: "fineprint", text: "컴퓨터에서 접속하면 회사 PC 업무 체험도 할 수 있어요" }) : null,
+      el("p", { cls: "fineprint", text: "약 5분 · 가상 대화 · 실제 설치·전송 없음 · 진행 중 언제든 끝내고 결과 확인 가능" }),
       el("p", { cls: "copyright", text: "© 2026 KARGI. All rights reserved." }));
     MK.root.replaceChildren(card);
     focusView(card);
@@ -82,6 +92,7 @@
 
   // ---------- 세션 ----------
   MK.prepare = function (dev) {
+    if (dev === "pc" && isMobileDevice()) { MK.home(); return; }
     MK.dev = dev;
     MK.D = MK.DATA[dev];
     MK.ui = MK.UI[dev];
@@ -109,11 +120,10 @@
     MK.revealTasks(0);
     document.body.className = "mode-" + dev;
     MK.ui.mount();
-    MK.syncOrientation();
   };
   MK.begin = function () {
     var S = MK.S;
-    if (S.running || MK.orientationBlocked()) { MK.syncOrientation(); return; }
+    if (S.running) return;
     S.running = true;
     S.last = performance.now();
     S.progress = el("progress", { cls: "session-progress", attrs: { max: S.eventEndSec, value: 0, "aria-label": "이벤트 진행도" } });
@@ -172,6 +182,7 @@
   function browserBack(event) {
     var S = MK.S, h = window.history;
     if (!S || !S.running || S.ended || !S.backGuard || browserMarker(event.state) || S.leavePrompt) return;
+    if (S.resultPrompt) { h.forward(); return; }
     if (MK.ui.browserBack && MK.ui.browserBack()) { h.forward(); return; }
     var behind = Array.prototype.slice.call(MK.root.children);
     behind.forEach(function (node) { node.setAttribute("inert", ""); });
@@ -185,17 +196,30 @@
   }
   if (window.addEventListener) window.addEventListener("popstate", browserBack);
 
-  MK.orientationBlocked = function () {
-    return MK.dev === "pc" && !!window.matchMedia && window.matchMedia("(orientation: portrait)").matches &&
-      !!(window.matchMedia("(any-pointer: coarse)").matches || navigator.maxTouchPoints > 0 ||
-        (navigator.userAgentData && navigator.userAgentData.mobile) || /Android|iPhone|iPad|Mobile/i.test(navigator.userAgent || ""));
-  };
-  MK.syncOrientation = function () { document.body.setAttribute("data-pc-portrait", String(MK.orientationBlocked())); };
-  if (window.addEventListener) window.addEventListener("resize", MK.syncOrientation);
-  MK.now = function () { var S = MK.S; return S.used + (document.hidden || MK.orientationBlocked() || S.leavePrompt ? 0 : performance.now() - S.last); };
+  function offerResults(S) {
+    S.resultsOffered = true;
+    var behind = Array.prototype.slice.call(MK.root.children);
+    behind.forEach(function (node) { node.setAttribute("inert", ""); });
+    S.resultPrompt = el("div", { cls: "session-leave" }, el("section", {
+      attrs: { role: "dialog", "aria-modal": "true", "aria-label": "결과를 확인할까요?" }
+    },
+      el("strong", { text: "결과를 확인할까요?" }),
+      el("p", { text: "예정된 이벤트가 모두 끝났어요. 남은 할 일은 더 해도 돼요." }),
+      btn("btn", "결과 보기", MK.finish, "event-results"),
+      btn("btn ghost", "더 하기", function () {
+        S.resultPrompt.remove();
+        S.resultPrompt = null;
+        behind.forEach(function (node) { node.removeAttribute("inert"); });
+        S.last = performance.now();
+        S.finishButton.focus();
+      }, "keep-playing")));
+    MK.root.appendChild(S.resultPrompt);
+    MK.focusView(S.resultPrompt);
+  }
+  MK.now = function () { var S = MK.S; return S.used + (document.hidden || S.leavePrompt || S.resultPrompt ? 0 : performance.now() - S.last); };
   function tick() {
     var S = MK.S, p = performance.now();
-    if (!document.hidden && !MK.orientationBlocked() && !S.leavePrompt) S.used += p - S.last;
+    if (!document.hidden && !S.leavePrompt && !S.resultPrompt) S.used += p - S.last;
     S.last = p;
     var t = S.used;
     S.scheduledItems.forEach(function (it) {
@@ -210,6 +234,7 @@
       S.progressLabel.textContent = "이벤트 종료";
       S.finishButton.textContent = "결과 확인";
     }
+    if (S.eventsDone && !S.resultsOffered && !S.leavePrompt && !document.hidden) offerResults(S);
     S.progress.setAttribute("value", S.eventsDone ? S.eventEndSec : Math.min(S.eventEndSec - 0.25, t / 1000));
   }
   document.addEventListener("visibilitychange", function () { if (MK.S) MK.S.last = performance.now(); });
@@ -482,7 +507,7 @@
     var other = MK.dev === "pc" ? "phone" : "pc";
     page.appendChild(el("div", { cls: "r-foot" },
       btn("btn ghost", "다시 하기", function () { MK.prepare(MK.dev); }, "again"),
-      btn("btn ghost", (other === "pc" ? "PC" : "휴대폰") + " 모드", function () { MK.prepare(other); }, "other"),
+      isMobileDevice() ? null : btn("btn experience-switch", experienceNames[other] + " 시작", function () { MK.prepare(other); }, "other"),
       el("p", { cls: "fineprint", text: "교육·오락용 자가진단" })));
     MK.root.replaceChildren(page);
     focusView(page);

@@ -65,7 +65,7 @@ function engine() {
     const entries=[null];let index=0;
     const history={get state(){return entries[index];},get length(){return entries.length;},pushState(state){entries.splice(++index,entries.length,state);},back(){if(index>0){index--;windowEvents.popstate({state:this.state});}},forward(){if(index+1<entries.length){index++;windowEvents.popstate({state:this.state});}}};
     context.window.history=history;return history;
-  }, setPortraitPhone(value) { context.window.matchMedia = () => ({ matches:value }); }, setDevice(portrait, touch, ua) { context.navigator.maxTouchPoints=touch; context.navigator.userAgent=ua; context.window.matchMedia=q=>({matches:q==="(orientation: portrait)" && portrait}); }, tick(ms) { clock.value += ms; ticker(); }, advance(ms) { clock.value+=ms; if(MK.ui.tick) MK.ui.tick(MK.now()); }, flush() { timers.splice(0).sort((a,b) => a.at-b.at).forEach(t => t.fn()); } };
+  }, setDevice(portrait, touch, ua) { context.navigator.maxTouchPoints=touch; context.navigator.userAgent=ua; context.window.matchMedia=q=>({matches:q==="(orientation: portrait)" && portrait}); }, tick(ms) { clock.value += ms; ticker(); }, advance(ms) { clock.value+=ms; if(MK.ui.tick) MK.ui.tick(MK.now()); }, flush() { timers.splice(0).sort((a,b) => a.at-b.at).forEach(t => t.fn()); } };
 }
 
 test('메일 요청 → 상대 답장 → 첨부 메일 순서를 유지하고 지난 답장을 되살리지 않는다', () => {
@@ -518,13 +518,6 @@ test('휴대폰은 3분 안에 핵심 이벤트가 도착하고 피싱 사이는
 });
 
 
-test('모바일 PC 모드를 세로로 돌린 동안에는 세션 시간을 멈춘다', () => {
-  const e=engine(),{MK}=e;MK.begin();e.tick(1000);assert.equal(MK.S.used,1000);
-  e.setPortraitPhone(true);e.tick(20000);assert.equal(MK.S.used,1000);
-  assert.equal(MK.now(),1000);
-  e.setPortraitPhone(false);e.tick(1000);assert.equal(MK.S.used,2000);
-});
-
 test('휴대폰은 배송 안내로 시작하고 카드 분실은 중반, 지수 연락은 후반에 도착한다', () => {
   const e=engine(),{MK,root}=e;MK.UI.phone=e.PhoneUI;MK.prepare('phone');act(root,'start');
   e.tick(3000);assert.equal(MK.S.delivered.L2,true);assert.equal(MK.S.delivered.s4,undefined);
@@ -577,20 +570,35 @@ for(const dev of ['phone','pc']) {
     assert.equal(MK.D.RECOMMENDED_SEC,300);
     for(let elapsed=0;elapsed<MK.D.RECOMMENDED_SEC*1000;elapsed+=250)e.tick(250);
     assert.equal(MK.S.ended,false);assert.equal(MK.S.eventsDone,true);
-    assert.ok(textOf(e.root).includes('이벤트 종료'));assert.ok(textOf(e.root).includes('결과 확인'));
+    assert.ok(textOf(e.root).includes('결과를 확인할까요?'));
     assert.deepEqual(scheduled.filter(id=>!MK.S.delivered[id]),[]);
-    act(e.root,'finish');assert.equal(MK.S.ended,true);
+    if(dev==='phone') {
+      act(e.root,'keep-playing');const time=MK.S.used;e.tick(1000);
+      assert.equal(MK.S.used,time+1000);assert.equal(MK.S.resultPrompt,null);
+      assert.equal(MK.S.ended,false);act(e.root,'finish');
+    } else {
+      act(e.root,'event-results');
+    }
+    assert.equal(MK.S.ended,true);
     assert.equal(MK.S.taskOrder.length,MK.D.TASKS.length);
   });
 }
 
 
-test('세로 휴대폰 브라우저는 마우스 모드여도 PC 시작을 막고 회전 후 허용한다', () => {
-  const e=engine(),{MK}=e;e.setDevice(true,5,'Desktop');MK.prepare('pc');
-  assert.equal(MK.orientationBlocked(),true);MK.begin();assert.equal(MK.S.running,false);
-  e.setDevice(false,5,'Desktop');MK.begin();assert.equal(MK.S.running,true);
-  e.setDevice(true,0,'Desktop');assert.equal(MK.orientationBlocked(),false);
-  e.setDevice(true,0,'Android');assert.equal(MK.orientationBlocked(),true);
+test('휴대폰에서는 방향과 관계없이 스마트폰 체험만 열리고 컴퓨터에서는 두 체험을 선택할 수 있다', () => {
+  for(const portrait of [true,false]){
+    const e=engine(),{MK,root}=e;e.setDevice(portrait,5,'Android');MK.prepare('pc');
+    assert.ok(textOf(root).includes('스마트폰 일상 체험'));
+    assert.ok(!findNode(root,n=>n.attrs['data-act']==='mode-pc'));
+    assert.ok(textOf(root).includes('컴퓨터에서 접속하면 회사 PC 업무 체험도 할 수 있어요'));
+    MK.UI.phone=e.PhoneUI;MK.prepare('phone');act(root,'start');act(root,'finish');
+    assert.ok(!findNode(root,n=>n.attrs['data-act']==='other'));
+  }
+  const e=engine(),{MK,root}=e;MK.home();
+  assert.ok(textOf(root).includes('스마트폰 일상 체험'));
+  assert.ok(textOf(root).includes('회사 PC 업무 체험'));
+  MK.UI.phone=e.PhoneUI;MK.prepare('phone');act(root,'start');act(root,'finish');
+  act(root,'other');assert.equal(MK.dev,'pc');
 });
 
 test('변조된 자료실은 PDF 대신 별도 주소와 실행 감지를 표시하고 담당자가 변조를 확인한다', () => {
@@ -616,7 +624,7 @@ test('브라우저 뒤로가기는 게임 안에서 이동하고 홈에서는 �
   assert.equal(h.length,2);act(root,'app-mail');h.back();assert.equal(MK.S.route.name,'home');assert.equal(h.length,2);
   h.back();assert.ok(textOf(root).includes('플레이를 그만할까요?'));const time=MK.S.used;e.tick(20000);assert.equal(MK.S.used,time);
   act(root,'stay');assert.ok(!MK.S.leavePrompt);assert.equal(h.state.mikkiphonePlaying,true);
-  h.back();act(root,'leave');assert.equal(MK.S,null);assert.equal(h.state,null);assert.ok(textOf(root).includes('휴대폰 시작'));
+  h.back();act(root,'leave');assert.equal(MK.S,null);assert.equal(h.state,null);assert.ok(textOf(root).includes('스마트폰 일상 체험'));
 });
 
 test('전체 화면은 버튼으로 열고 결과로 이동하면 해제한다', async () => {
