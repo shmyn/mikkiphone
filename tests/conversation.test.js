@@ -514,7 +514,7 @@ test('휴대폰은 배송 안내로 시작하고 카드 분실은 중반, 지수
   const e=engine(),{MK,root}=e;MK.UI.phone=e.PhoneUI;MK.prepare('phone');act(root,'start');
   e.tick(3000);assert.equal(MK.S.delivered.L2,true);assert.equal(MK.S.delivered.s4,undefined);
   e.tick(63000);assert.equal(MK.S.tasks.t4visible,true);assert.equal(MK.S.delivered.L1,undefined);
-  assert.equal(MK.D.TASKS.at(-2).id,'t1');assert.equal(MK.D.TASKS.length,6);
+  assert.ok(MK.visibleTasks().some(task=>task.id==='t4'));assert.equal(MK.D.TASKS.at(-1).id,'t1');assert.equal(MK.D.TASKS.length,6);
 });
 
 

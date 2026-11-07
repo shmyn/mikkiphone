@@ -1724,14 +1724,14 @@
     "waitsFor": "A2"
   },
   {
-    "id": "t1",
-    "text": "지수와 내일 약속 정하기",
-    "waitsFor": "L1"
-  },
-  {
     "id": "t4",
     "text": "토스 체크카드 분실 신고",
     "appearsWith": "s8"
+  },
+  {
+    "id": "t1",
+    "text": "지수와 내일 약속 정하기",
+    "waitsFor": "L1"
   }
 ];
 
