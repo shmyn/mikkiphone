@@ -586,7 +586,11 @@ for(const dev of ['phone','pc']) {
         assert.ok(!MK.S.resultPrompt);
         act(e.root,'popup-close');
       }
-      if(dev==='pc' && elapsed===MK.S.schedule.Lp8) assert.ok(!MK.S.resultPrompt);
+      if(elapsed===MK.S.schedule[dev==='pc' ? 'Lp8' : 's3']){
+        if(dev==='phone') assert.ok(textOf(e.root).includes(MK.cleanText(MK.ITEM.s3.body)));
+        assert.ok(!MK.S.resultPrompt);
+      }
+      if(MK.S.eventsDone && elapsed < MK.S.eventsDoneAt+8000) assert.ok(!MK.S.resultPrompt);
     }
     assert.equal(MK.S.ended,false);assert.equal(MK.S.eventsDone,true);
     assert.ok(textOf(e.root).includes('결과를 확인할까요?'));
