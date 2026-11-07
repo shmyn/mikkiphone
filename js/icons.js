@@ -13,6 +13,12 @@
 
   // [태그, 속성] 목록. fill/stroke는 currentColor라 버튼 글자색을 따른다.
   var SHAPES = {
+    mikkiphone: [
+      ["rect", { x: "5", y: "1", width: "14", height: "22", rx: "4", fill: "#15242c" }],
+      ["rect", { x: "6.5", y: "2.5", width: "11", height: "19", rx: "2.5", fill: "#e3edf0" }],
+      ["path", { d: "M12 4.5v3M10.5 19.5h3", fill: "none", stroke: "#15242c", "stroke-linecap": "round" }],
+      ["path", { d: "M8.5 12c0-2.5 1.5-4.5 3.5-4.5s3.5 2 3.5 4.5-1.5 4-3.5 4-3.5-1.5-3.5-4z", fill: "#fff", stroke: "#15242c", "stroke-width": ".8" }],
+      ["path", { d: "M9 11.7c.1-2 1.4-3.8 3-3.8s2.9 1.8 3 3.8z", fill: "#e0412b" }]],
     phone: [["path", { d: HANDSET, fill: "currentColor" }]],
     hangup: [["path", { d: HANDSET, fill: "currentColor", transform: "rotate(135 12 12)" }]],
     messages: [["path", { d: "M12 4C7 4 3 7.1 3 11c0 2.2 1.3 4.2 3.4 5.5L5.6 20l4.1-2.3c.75.13 1.5.2 2.3.2 5 0 9-3.1 9-7s-4-6.9-9-6.9z", fill: "currentColor" }]],

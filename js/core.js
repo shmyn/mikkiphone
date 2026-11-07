@@ -75,7 +75,7 @@
     document.body.className = "";
     var mobile = isMobileDevice();
     var card = el("section", { cls: "startcard" },
-      el("div", { cls: "bobber", attrs: { "aria-hidden": "true" } }),
+      el("div", { cls: "start-logo" }, MK.icon("mikkiphone", 64)),
       el("h1", { cls: "wordmark", text: "미끼폰" }),
       el("p", { cls: "lede", text: "나는 어떻게 낚이는 사람일까" }),
       el("p", { cls: "intro-purpose", text: "일상에서 마주칠 수 있는 피싱 위험에 대한 내 취약점을 진단하는 시뮬레이션" }),
@@ -128,7 +128,7 @@
     S.last = performance.now();
     S.progress = el("progress", { cls: "session-progress", attrs: { max: S.eventEndSec, value: 0, "aria-label": "이벤트 진행도" } });
     S.progressLabel = el("span", { cls: "session-label", text: "진행", attrs: { role: "status" } });
-    S.finishButton = btn("session-finish", "끝내고 결과 보기", MK.finish, "finish");
+    S.finishButton = btn("session-finish", "바로 결과 확인", MK.finish, "finish");
     S.fullscreenButton = btn("session-fullscreen", "전체 화면", toggleFullscreen, "fullscreen");
     S.fullscreenButton.setAttribute("aria-pressed", "false");
     S.fullscreenTip = el("p", { cls: "fullscreen-tip", attrs: { role: "status" } });
@@ -232,7 +232,6 @@
     if (!S.eventsDone && S.scheduledItems.every(function (it) { return S.delivered[it.id]; })) {
       S.eventsDone = true;
       S.progressLabel.textContent = "이벤트 종료";
-      S.finishButton.textContent = "결과 확인";
     }
     if (S.eventsDone && !S.resultsOffered && !S.leavePrompt && !document.hidden) offerResults(S);
     S.progress.setAttribute("value", S.eventsDone ? S.eventEndSec : Math.min(S.eventEndSec - 0.25, t / 1000));
@@ -466,6 +465,10 @@
     document.body.className = "";
 
     var page = el("section", { cls: "resultpage" });
+    page.appendChild(el("button", {
+      cls: "result-home", attrs: { type: "button", "data-act": "result-home" }, onClick: MK.home
+    }, MK.icon("mikkiphone", 32),
+      el("strong", { text: "미끼폰" }), el("span", { text: "홈으로" })));
     page.appendChild(el("header", { cls: "r-head" },
       el("p", { cls: "r-mode", text: "미끼폰 · " + modeName + " 결과" }),
       el("h2", { text: T.name }), el("p", { cls: "r-line", text: T.line }),
