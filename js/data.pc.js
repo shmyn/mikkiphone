@@ -353,7 +353,7 @@
   {
     "id": "Lp1",
     "kind": "legit",
-    "at": 52,
+    "at": 4,
     "title": "팀장 업무 메시지",
     "channel": "chat",
     "thread": "pc_park",
@@ -370,7 +370,7 @@
   {
     "id": "Lp2",
     "kind": "legit",
-    "at": 64,
+    "at": 16,
     "title": "거래처 견적서 메일",
     "channel": "mail",
     "thread": "pm_partner",
@@ -398,7 +398,7 @@
     "kind": "phish",
     "verified": true,
     "source": "기업 담당자 대상 압축 파일 속 바로가기 실행 스피어피싱(탐색 주간 보도)",
-    "at": 76,
+    "at": 34,
     "title": "견적서 수정본 압축 파일",
     "channel": "mail",
     "thread": "pm_p2",
@@ -432,7 +432,7 @@
   {
     "id": "Ap1",
     "kind": "ambient",
-    "at": 84,
+    "at": 50,
     "channel": "mail",
     "thread": "pm_letter",
     "subject": "일요일에 읽고 싶은 다섯 페이지",
@@ -441,7 +441,7 @@
   {
     "id": "Lp5",
     "kind": "legit",
-    "at": 92,
+    "at": 58,
     "title": "동료 점심 메시지",
     "channel": "chat",
     "thread": "pc_kim",
@@ -470,7 +470,7 @@
     "kind": "phish",
     "verified": true,
     "source": "KISA ‘개인정보 유출 보상금’ 미끼 경고",
-    "at": 106,
+    "at": 76,
     "title": "보상금 조회 프로그램 메일",
     "channel": "mail",
     "thread": "pm_p6",
@@ -497,18 +497,19 @@
   {
     "id": "Lp3",
     "kind": "legit",
-    "at": 120,
+    "at": 92,
     "title": "IT지원팀 보안 공지",
     "channel": "mail",
     "thread": "pm_it",
     "subject": "이번 주 보안 업데이트 자동 배포 안내",
-    "body": "이번 주 보안 업데이트는 자동으로 배포됩니다. IT지원팀은 메일로 설치 파일을 보내지 않습니다."
+    "body": "이번 주 보안 업데이트는 자동으로 배포됩니다. IT지원팀은 메일로 설치 파일을 보내지 않습니다.",
+    "taskStep": "security_notice_read"
   },
   {
     "id": "P3",
     "kind": "phish",
     "verified": false,
-    "at": 134,
+    "at": 110,
     "title": "IT팀 사칭 설치 파일",
     "channel": "mail",
     "thread": "pm_p3",
@@ -536,7 +537,7 @@
   {
     "id": "Lp6",
     "kind": "legit",
-    "at": 148,
+    "at": 128,
     "title": "지수 주말 사진",
     "channel": "chat",
     "thread": "pc_jisu",
@@ -559,7 +560,7 @@
     "id": "P5",
     "kind": "phish",
     "verified": false,
-    "at": 162,
+    "at": 146,
     "title": "지인 새 계정 사진 링크",
     "channel": "chat",
     "thread": "pc_p5",
@@ -584,7 +585,7 @@
   {
     "id": "Lp4",
     "kind": "legit",
-    "at": 28,
+    "at": 164,
     "title": "시스템 업데이트 알림",
     "channel": "toast",
     "source": "시스템",
@@ -601,7 +602,7 @@
   {
     "id": "Ap2",
     "kind": "ambient",
-    "at": 186,
+    "at": 190,
     "channel": "chat",
     "thread": "pc_group",
     "body": "오늘 15시~16시 엘리베이터 점검 있습니다."
@@ -610,7 +611,7 @@
     "id": "P7",
     "kind": "phish",
     "verified": false,
-    "at": 194,
+    "at": 182,
     "title": "팀장 사칭 상품권 요청",
     "channel": "mail",
     "thread": "pm_p7",
@@ -659,7 +660,7 @@
   {
     "id": "Lp9",
     "kind": "legit",
-    "at": 210,
+    "at": 200,
     "title": "인사팀 연말정산 안내",
     "channel": "mail",
     "thread": "pm_hr",
@@ -670,7 +671,7 @@
     "id": "P8",
     "kind": "phish",
     "verified": false,
-    "at": 226,
+    "at": 218,
     "title": "인사 문서 열람 로그인",
     "channel": "mail",
     "thread": "pm_p8",
@@ -697,7 +698,7 @@
   {
     "id": "Lp8",
     "kind": "legit",
-    "at": 242,
+    "at": 236,
     "title": "쿠팡 출고 메일",
     "channel": "mail",
     "thread": "pm_moamall",
@@ -708,7 +709,7 @@
     "id": "P4",
     "kind": "phish",
     "verified": false,
-    "at": 2,
+    "at": 260,
     "title": "가짜 감염 경고창",
     "channel": "popup",
     "popup": {
@@ -735,7 +736,7 @@
   {
     "id": "Lp7",
     "kind": "legit",
-    "at": 274,
+    "at": 174,
     "title": "회의 일정 알림",
     "channel": "toast",
     "source": "캘린더",
@@ -787,7 +788,7 @@
   {
     "id": "Ap3",
     "kind": "ambient",
-    "at": 117,
+    "at": 64,
     "channel": "chat",
     "thread": "pc_yuna",
     "body": "하늘님 탕비실에 간식 들어왔대요. 나중에 오실 때 커피 한 잔 하실래요?",
@@ -1059,6 +1060,18 @@
   {
     "id": "t3",
     "text": "한빛상사 회사 소개서 받기"
+  },
+  {
+    "id": "t4",
+    "text": "캘린더에서 주간 회의 장소 확인하기"
+  },
+  {
+    "id": "t5",
+    "text": "IT 공지 확인하고 오늘 밤 업데이트 예약하기",
+    "requires": [
+      "security_notice_read",
+      "update_reserved"
+    ]
   }
 ];
 

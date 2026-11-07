@@ -36,6 +36,7 @@
   }
 
   // ---------- 엔진 연결 ----------
+  UI.canDeliver = function (it) { return it.channel !== "popup" || (P.app === "browser" && !P.modal && !P.popup); };
   UI.onDeliver = function (it) {
     if (it.channel === "popup") { P.popup = { item: it, stage: 0 }; MK.markOpened(it); render(); return; }
     if (it.channel === "page") return;
@@ -444,6 +445,7 @@
     [["10:00", "팀 스탠드업", true], ["12:00", "점심", false], ["15:00", "주간 회의 · 2번 회의실", false], ["17:30", "거래처 견적 회신 마감", false]].forEach(function (e) {
       c.appendChild(el("div", { cls: "calrow" + (e[2] ? " past" : "") }, el("span", { cls: "ctime", text: e[0] }), el("span", { text: e[1] })));
     });
+    c.appendChild(btn("btn small", MK.S.tasks.t4 ? "회의 장소 확인 완료" : "주간 회의 장소 확인", function () { MK.doneTask("t4"); render(); }, "calendar-confirm"));
     return c;
   }
   function galleryView() {
@@ -458,7 +460,7 @@
       el("button", { cls: "switch" + (P.dnd ? " on" : ""), attrs: { role: "switch", "aria-checked": String(P.dnd), "aria-label": "방해 금지", "data-act": "set-dnd" }, onClick: function () { P.dnd = !P.dnd; render(); } }, el("span"))));
     var up = MK.ITEM.Lp4, ready = MK.S.delivered.Lp4;
     c.appendChild(el("div", { cls: "row static setrow" }, el("span", { cls: "rt", text: "업데이트" }),
-      ready ? btn("mini", MK.S.st.Lp4.handled ? "오늘 밤 설치 예약됨" : "오늘 밤 설치", function () { MK.markOpened(up); render(); }, "update") : el("span", { cls: "rs", text: "최신 상태" })));
+      ready ? btn("mini", MK.S.taskSteps.update_reserved ? "오늘 밤 설치 예약됨" : "오늘 밤 설치", function () { MK.markOpened(up); MK.taskStep("update_reserved"); render(); }, "update") : el("span", { cls: "rs", text: "최신 상태" })));
     c.appendChild(el("div", { cls: "row static setrow" }, el("span", { cls: "rt", text: "기기 이름" }), el("span", { cls: "rs", text: "SALES-PC-07" })));
     return c;
   }

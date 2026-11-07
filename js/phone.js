@@ -12,12 +12,12 @@
   var UI = MK.UI.phone = {};
 
   UI.mount = function () {
-    P = { call: null, bankAuth: "idle", recent: MK.D.CALL_HISTORY.map(function (c) { return { name: c.name, label: c.label, seen: true }; }),
+    P = { call: null, bankAuth: "idle", recentRoutes: [], recent: MK.D.CALL_HISTORY.map(function (c) { return { name: c.name, label: c.label, seen: true }; }),
       photos: MK.D.PHOTOS.map(function (ph) { return Object.assign({}, ph); }), camera: { scene: "workspace", zoom: 1, flash: false, capturing: false }, threadMenu: null, threadLinks: null, threadScroll: {}, place: null, settings: { wifi: true, bt: false, dnd: false } };
     statusEl = el("div", { cls: "status" });
     hostEl = el("div", { cls: "host" });
     layerEl = el("div", { cls: "layer" });
-    var frame = el("div", { cls: "phone" }, el("div", { cls: "screen", attrs: { "aria-live": "polite" } }, statusEl, hostEl, layerEl, el("button", { cls: "phone-home-indicator", attrs: { "aria-label": "홈 화면", "data-act": "home" }, onClick: home })));
+    var frame = el("div", { cls: "phone galaxy-phone" }, el("div", { cls: "screen", attrs: { "aria-live": "polite" } }, statusEl, hostEl, layerEl, systemNavigation()));
     MK.root.replaceChildren(frame);
     lockScreen();
   };
@@ -28,7 +28,7 @@
     var v = el("div", { cls: "view lock" },
       el("div", { cls: "lock-time", text: MK.clockText() }),
       el("div", { cls: "lock-date", text: (d.getMonth() + 1) + "월 " + d.getDate() + "일 " + "일월화수목금토"[d.getDay()] + "요일" }),
-      el("div", { cls: "lock-note" }, el("span", { cls: "bicon app-messages" }, icon("messages", 14)), el("span", { text: "오늘 할 일 3개 · 평소처럼 써 주세요" })),
+      el("div", { cls: "lock-note" }, el("span", { cls: "bicon app-messages" }, icon("messages", 14)), el("span", { text: "배송 확인, 가족 연락 · 평소처럼 써 주세요" })),
       btn("btn lockbtn", "열기", function () { MK.S.route = { name: "home" }; MK.begin(); render(true); }, "start"));
     hostEl.replaceChildren(v);
     MK.focusView(v);
@@ -79,14 +79,39 @@
   }
 
   // ---------- 이동 ----------
+  function rememberRoute(route) {
+    var app = route.name === "app" ? route.app : (route.name === "thread" ? MK.D.THREADS[route.id].app : (route.name === "kakao" ? "talk" : (["page", "search"].indexOf(route.name) >= 0 ? "web" : null)));
+    if (!app) return;
+    P.recentRoutes = P.recentRoutes.filter(function (r) { return r.app !== app; });
+    P.recentRoutes.unshift({ app: app, route: Object.assign({}, route) });
+    P.recentRoutes = P.recentRoutes.slice(0, 6);
+  }
+  function systemNavigation() {
+    var nav = el("nav", { cls: "system-navigation", attrs: { "aria-label": "휴대폰 탐색 버튼" } });
+    [["recents", "최근 앱", function () { go({ name: "recents" }); }], ["home", "홈", home], ["system-back", "뒤로", back]].forEach(function (spec) {
+      nav.appendChild(el("button", { cls: "system-nav-button", attrs: { "aria-label": spec[1], "data-act": spec[0] }, onClick: function () { if (MK.S.running) spec[2](); } },
+        el("span", { cls: "system-glyph glyph-" + spec[0], attrs: { "aria-hidden": "true" } }), el("span", { text: spec[1] })));
+    });
+    return nav;
+  }
+  function recentAppsView() {
+    var view = el("div", { cls: "view recent-apps" }, el("h2", { text: "최근 사용한 앱" }));
+    if (!P.recentRoutes.length) view.appendChild(el("p", { text: "앱을 열면 여기에 표시돼요" }));
+    P.recentRoutes.forEach(function (recent) {
+      view.appendChild(el("button", { cls: "recent-app-card", attrs: { "data-act": "recent-" + recent.app }, onClick: function () { go(recent.route); } },
+        icon(recent.app, 30, true), el("strong", { text: APPS[recent.app] }), el("span", { text: "이어서 보기" })));
+    });
+    return view;
+  }
   function go(route, reset) {
+    rememberRoute(route);
     if (reset) MK.S.stack = []; else MK.S.stack.push(MK.S.route);
     MK.S.route = route;
     render(true);
   }
   function back() { MK.S.route = MK.S.stack.pop() || { name: "home" }; render(true); }
   function home() { go({ name: "home" }, true); }
-  function setRoute(r) { MK.S.route = r; render(); }
+  function setRoute(r) { rememberRoute(r); MK.S.route = r; render(); }
 
   function render(moved) {
     if (!MK.S || MK.S.ended || !MK.S.route) return;
@@ -97,6 +122,7 @@
   }
   function routeView(r) {
     switch (r.name) {
+      case "recents": return recentAppsView();
       case "kakao": return kakaoTab(r.tab);
       case "app": return appView(r.app, r.tab);
       case "thread": return threadView(r.id);
@@ -163,9 +189,10 @@
     var S = MK.S;
     var memo = el("div", { cls: "memo" }, el("div", { cls: "memo-h", text: "오늘 할 일" }));
     MK.D.TASKS.forEach(function (t) {
-      if (t.appearsWith && !S.tasks.t4visible) return;
+      if (t.appearsWith && !S.delivered[t.appearsWith]) return;
       memo.appendChild(el("div", { cls: "task" + (S.tasks[t.id] ? " done" : "") },
-        el("span", { cls: "box", attrs: { "aria-hidden": "true" } }), el("span", { text: t.text })));
+        el("span", { cls: "box", attrs: { "aria-hidden": "true" } }), el("span", { text: t.text }),
+        t.waitsFor && !S.delivered[t.waitsFor] ? el("small", { cls: "task-wait", text: "연락 대기" }) : null));
     });
     if (S.tasks.t4visible) memo.appendChild(el("p", { cls: "memo-note", text: MK.ITEM.s8.body }));
     var grid = el("div", { cls: "grid" });

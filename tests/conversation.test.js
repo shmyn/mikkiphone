@@ -479,15 +479,14 @@ test('예약 알림은 모드별 간격과 종료 시간을 지킨다', () => {
 });
 
 
-test('미션 전에 일반·피싱 전화와 PC 경고창을 먼저 배치한다', () => {
+test('피싱은 정상 연락의 맥락을 만든 뒤에 배치하고 PC 경고는 후반으로 보낸다', () => {
   const {MK}=engine();MK.prepare('phone');
-  const phone=Object.keys(MK.S.schedule).sort((a,b)=>MK.S.schedule[a]-MK.S.schedule[b]);
-  assert.deepEqual(phone.slice(0,2),['L5','s4']);
-  assert.equal(MK.ITEM.L5.kind,'legit');assert.equal(MK.ITEM.s4.kind,'phish');
-  assert.ok(MK.S.schedule.s4<MK.S.schedule.L1);
+  for(const [normal,fake] of [['L9','s1'],['L5','s5'],['L8','s8'],['L6','s6']])assert.ok(MK.S.schedule[normal]<MK.S.schedule[fake]);
+  assert.ok(MK.S.schedule.s8<90000);
+  assert.ok(MK.S.schedule.s8<MK.S.schedule.L1);
   MK.prepare('pc');
-  assert.ok(MK.S.schedule.P4<MK.S.schedule.Lp2);
-  assert.ok(MK.S.schedule.Lp4<MK.S.schedule.Lp2);
+  for(const [normal,fake] of [['Lp2','P2'],['Lp3','P3'],['Lp6','P5'],['Lp7','P7'],['Lp9','P8']])assert.ok(MK.S.schedule[normal]<MK.S.schedule[fake]);
+  assert.ok(MK.S.schedule.P4>=240000);
 });
 
 
@@ -497,7 +496,7 @@ test('휴대폰은 3분 안에 핵심 이벤트가 도착하고 피싱 사이는
   assert.equal(phish.length,8);
   phish.forEach((it,i)=>{if(i)assert.ok(MK.S.schedule[it.id]-MK.S.schedule[phish[i-1].id]>=18000);});
   assert.ok(MK.S.schedule.s8<=164000);
-  assert.ok(MK.D.ITEMS.filter(it=>it.kind==='ambient').every(it=>it.at===null));
+  assert.deepEqual(MK.D.ITEMS.filter(it=>it.kind==='ambient' && it.at!=null).map(it=>it.id),['A2']);
 });
 
 
@@ -508,8 +507,32 @@ test('모바일 PC 모드를 세로로 돌린 동안에는 세션 시간을 멈�
   e.setPortraitPhone(false);e.tick(1000);assert.equal(MK.S.used,2000);
 });
 
-test('휴대폰 시작 후 미션 답장보다 일반 전화와 사칭 전화가 먼저 도착한다', () => {
+test('휴대폰은 배송 안내로 시작하고 카드 분실은 중반, 지수 연락은 후반에 도착한다', () => {
   const e=engine(),{MK,root}=e;MK.UI.phone=e.PhoneUI;MK.prepare('phone');act(root,'start');
-  e.tick(2000);assert.equal(MK.S.delivered.L5,true);assert.equal(MK.S.delivered.L1,undefined);
-  e.tick(16000);e.tick(6000);assert.equal(MK.S.delivered.s4,true);assert.equal(MK.S.delivered.L1,undefined);
+  e.tick(4000);assert.equal(MK.S.delivered.L2,true);assert.equal(MK.S.delivered.s4,undefined);
+  e.tick(78000);assert.equal(MK.S.tasks.t4visible,true);assert.equal(MK.S.delivered.L1,undefined);
+  assert.equal(MK.D.TASKS.at(-2).id,'t1');assert.equal(MK.D.TASKS.length,6);
+});
+
+
+test('갤럭시 하단의 홈·뒤로·최근 앱과 앱 재진입이 동작한다', () => {
+  const {MK,root}=phoneEngine();act(root,'app-bank');act(root,'home');act(root,'recents');
+  assert.ok(textOf(root).includes('최근 사용한 앱'));act(root,'recent-bank');assert.equal(MK.S.route.app,'bank');
+  act(root,'system-back');assert.equal(MK.S.route.name,'recents');act(root,'home');assert.equal(MK.S.route.name,'home');
+  const nav=findNode(root,n=>n.className==='system-navigation');assert.equal(nav.children.length,3);
+});
+
+test('추가 일상 미션은 단톡방 답장과 가족 통화 선택에 연결된다', () => {
+  const {MK}=phoneEngine();MK.deliver(MK.ITEM.A2);MK.replyChips('k_group').find(ch=>ch.label.includes('강남역')).run();
+  assert.equal(MK.S.tasks.t6,true);
+  assert.ok(MK.ITEM.L5.dialog.nodes.b.choices.every(ch=>ch.task==='t5'));
+  assert.ok(MK.D.CONTACTS.find(ct=>ct.key==='mom').dialog.nodes.a.choices.some(ch=>ch.task==='t5'));
+});
+
+test('PC 감염 팝업은 브라우저를 사용할 때만 나오며 업데이트 미션은 읽기와 실제 예약을 요구한다', () => {
+  const {MK,PCUI,root}=engine();MK.ui=PCUI;PCUI.mount();MK.S.running=true;PCUI.render();
+  assert.equal(PCUI.canDeliver(MK.ITEM.P4),false);act(root,'desk-browser');assert.equal(PCUI.canDeliver(MK.ITEM.P4),true);
+  MK.deliver(MK.ITEM.Lp3);MK.markOpened(MK.ITEM.Lp3);assert.equal(MK.S.tasks.t5,undefined);
+  MK.deliver(MK.ITEM.Lp4);act(root,'tb-settings');act(root,'update');assert.equal(MK.S.tasks.t5,true);
+  act(root,'tb-calendar');act(root,'calendar-confirm');assert.equal(MK.S.tasks.t4,true);
 });

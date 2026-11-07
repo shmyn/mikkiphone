@@ -416,7 +416,7 @@
   {
     "id": "L2",
     "kind": "legit",
-    "at": 54,
+    "at": 4,
     "title": "쿠팡 배송 시작 알림",
     "channel": "push",
     "app": "moamall",
@@ -427,7 +427,7 @@
     "id": "L9",
     "quiet": true,
     "kind": "legit",
-    "at": 56,
+    "at": 8,
     "title": "CJ대한통운 배송 출발 문자",
     "channel": "sms",
     "thread": "hanbit",
@@ -437,7 +437,7 @@
     "id": "s1",
     "kind": "phish",
     "verified": false,
-    "at": 44,
+    "at": 22,
     "title": "국제발신 택배 문자",
     "channel": "sms",
     "thread": "t_s1",
@@ -463,7 +463,7 @@
   {
     "id": "L1",
     "kind": "legit",
-    "at": 34,
+    "at": 114,
     "title": "지수 약속 메시지",
     "channel": "talk",
     "thread": "k_jisu",
@@ -502,7 +502,7 @@
     "kind": "phish",
     "verified": true,
     "source": "KISA ‘개인정보 유출 보상금’ 미끼 스미싱 경고",
-    "at": 64,
+    "at": 42,
     "title": "유출 보상금 문자",
     "channel": "sms",
     "thread": "t_s2",
@@ -528,7 +528,7 @@
   {
     "id": "L5",
     "kind": "legit",
-    "at": 2,
+    "at": 32,
     "title": "엄마 전화",
     "channel": "call",
     "caller": "엄마",
@@ -558,11 +558,13 @@
           "choices": [
             {
               "label": "응, 갈게",
-              "to": "c"
+              "to": "c",
+              "task": "t5"
             },
             {
               "label": "이번 주는 좀 바빠",
-              "to": "d"
+              "to": "d",
+              "task": "t5"
             }
           ]
         },
@@ -584,17 +586,29 @@
   {
     "id": "A2",
     "kind": "ambient",
-    "at": null,
+    "at": 70,
     "channel": "talk",
     "thread": "k_group",
     "body": "금요일 7시 강남역 어때?",
-    "sender": "민준"
+    "sender": "민준",
+    "replies": [
+      [
+        {
+          "label": "금요일 7시 강남역 좋아!",
+          "effect": "handled",
+          "task": "t6",
+          "then": [
+            "좋아, 그럼 내가 근처로 예약할게!"
+          ]
+        }
+      ]
+    ]
   },
   {
     "id": "s5",
     "kind": "phish",
     "verified": false,
-    "at": 84,
+    "at": 62,
     "title": "가족 사칭 메신저",
     "channel": "talk",
     "thread": "k_s5",
@@ -644,7 +658,7 @@
   {
     "id": "L6",
     "kind": "legit",
-    "at": 94,
+    "at": 92,
     "title": "서연 청첩장",
     "channel": "talk",
     "thread": "k_seoyeon",
@@ -669,7 +683,7 @@
     "id": "s6",
     "kind": "phish",
     "verified": false,
-    "at": 104,
+    "at": 102,
     "title": "모바일 청첩장 문자",
     "channel": "sms",
     "thread": "t_s6",
@@ -696,7 +710,7 @@
     "kind": "phish",
     "verified": true,
     "source": "계좌 보호 명목 원격제어 앱 설치 요구 수법(경찰 안내)",
-    "at": 24,
+    "at": 142,
     "title": "수사기관 사칭 전화",
     "channel": "call",
     "caller": "02-●●●-1130",
@@ -783,7 +797,7 @@
     "id": "L7",
     "quiet": true,
     "kind": "legit",
-    "at": 114,
+    "at": 118,
     "title": "무신사 주문 메일",
     "channel": "mail",
     "thread": "m_nuri",
@@ -795,7 +809,7 @@
     "kind": "phish",
     "verified": true,
     "source": "11/2 일본 노지마 유출 후 비밀번호 강제 초기화 사례 변형",
-    "at": 124,
+    "at": 122,
     "title": "비밀번호 초기화 메일",
     "channel": "mail",
     "thread": "m_s7",
@@ -858,7 +872,7 @@
     "kind": "phish",
     "verified": true,
     "source": "금융사 사칭 금리·한도 조정 제안(경찰 주의보)",
-    "at": 144,
+    "at": 162,
     "title": "저금리 대출 문자",
     "channel": "sms",
     "thread": "t_s3",
@@ -921,7 +935,7 @@
     "id": "L3",
     "quiet": true,
     "kind": "legit",
-    "at": 140,
+    "at": 138,
     "title": "CJ대한통운 배송 완료 문자",
     "channel": "sms",
     "thread": "hanbit",
@@ -930,7 +944,7 @@
   {
     "id": "L8",
     "kind": "legit",
-    "at": 154,
+    "at": 74,
     "title": "토스 체크카드 결제 문자",
     "channel": "sms",
     "thread": "daon",
@@ -941,7 +955,7 @@
     "kind": "phish",
     "verified": true,
     "source": "KISA 검색 상단 광고 악용 피싱 사이트 수법",
-    "at": 164,
+    "at": 82,
     "title": "분실 신고 검색 광고",
     "channel": "task",
     "body": "어? 방금 모르는 결제 문자가 왔는데 지갑이 없다. 카드 분실 신고부터 하자.",
@@ -1209,7 +1223,8 @@
             },
             {
               "label": "주말에 반찬 가지러 갈게",
-              "to": "w"
+              "to": "w",
+              "task": "t5"
             },
             {
               "label": "엄마, 다른 번호로 카톡 보냈어?",
@@ -1690,16 +1705,26 @@
 
   var TASKS = [
   {
-    "id": "t1",
-    "text": "지수한테 내일 약속 시간 답장하기"
-  },
-  {
     "id": "t2",
     "text": "쿠팡에서 니트 배송 확인하기"
   },
   {
     "id": "t3",
     "text": "토스에서 이번 달 카드 사용액 확인하기"
+  },
+  {
+    "id": "t5",
+    "text": "엄마와 주말 방문 일정 정하기"
+  },
+  {
+    "id": "t6",
+    "text": "단톡방에서 모임 장소 답장하기",
+    "waitsFor": "A2"
+  },
+  {
+    "id": "t1",
+    "text": "지수한테 내일 약속 시간 답장하기",
+    "waitsFor": "L1"
   },
   {
     "id": "t4",

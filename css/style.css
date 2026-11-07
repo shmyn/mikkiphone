@@ -547,3 +547,15 @@ a.modebtn { text-decoration: none; }
   .rotate-notice strong { font-size:25px; }
   .rotate-notice p { max-width:280px; line-height:1.7; color:#d0d5da; }
 }
+
+/* Start/result pages keep their own mobile gutters instead of inheriting full-screen phone rules. */
+body:not(.mode-phone):not(.mode-pc) .stage { padding:max(28px,env(safe-area-inset-top)) max(22px,env(safe-area-inset-right)) max(28px,env(safe-area-inset-bottom)) max(22px,env(safe-area-inset-left)); grid-template-columns:minmax(0,1fr); }
+.startcard { width:min(420px,100%); min-width:0; padding:0; margin:auto; }
+.startcard .wordmark { font-size:clamp(52px,16vw,72px); }
+.startcard .intro-purpose,.startcard .fineprint { word-break:keep-all; overflow-wrap:break-word; }
+.startcard .modes { width:100%; }
+@media (max-width:420px) {
+  .startcard .lede { font-size:18px; margin-bottom:20px; }
+  .startcard .intro-purpose { font-size:14px; }
+  .startcard .modebtn { padding:16px 18px; }
+}

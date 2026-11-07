@@ -153,6 +153,7 @@
     MK.S.unread[it.id] = false;
     if (!st.opened) { st.opened = true; st.openedAt = MK.now(); }
     if (it.kind === "legit" && !st.blocked) st.handled = true;
+    if (it.kind === "legit" && it.taskStep) MK.taskStep(it.taskStep);
   };
   MK.enter = function (it, fromMs) {
     var st = MK.S.st[it.id];
@@ -180,7 +181,7 @@
   };
   MK.doneTask = function (id) {
     var t = MK.D.TASKS.filter(function (x) { return x.id === id; })[0];
-    if (t && (!t.appearsWith || MK.S.tasks[t.id + "visible"])) MK.S.tasks[id] = true;
+    if (t && (!t.appearsWith || MK.S.delivered[t.appearsWith])) MK.S.tasks[id] = true;
   };
 
   // ---------- 대화방 ----------
