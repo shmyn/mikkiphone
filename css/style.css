@@ -555,7 +555,8 @@ a.modebtn { text-decoration: none; }
 .intro-copy p, .intro-footer p { margin: 0; }
 .intro-copy .intro-tagline { font-weight: 700; color: var(--ink); }
 .intro-footer { display: grid; gap: 6px; margin-top: 16px; font-size: 13px; color: #bac6cc; }
-.intro-footer .copyright { margin-top: 6px; }
+#app:has(> .startcard) { grid-template-rows: 1fr auto; row-gap: 32px; }
+#app > .copyright { width: min(420px, 100%); font-size: 12px; color: #bac6cc; }
 
 /* Start/result pages keep their own mobile gutters instead of inheriting full-screen phone rules. */
 body:not(.mode-phone):not(.mode-pc) .stage { padding:max(28px,env(safe-area-inset-top)) max(22px,env(safe-area-inset-right)) max(28px,env(safe-area-inset-bottom)) max(22px,env(safe-area-inset-left)); grid-template-columns:minmax(0,1fr); }
@@ -565,9 +566,9 @@ body:not(.mode-phone):not(.mode-pc) .stage { padding:max(28px,env(safe-area-inse
 .startcard .modes { width:100%; }
 @media (max-width: 640px) {
   #app:has(> .startcard) {
-    align-content: start;
     padding-top: max(clamp(32px, 9svh, 76px), env(safe-area-inset-top));
   }
+  .startcard { align-self: start; margin-block: 0; }
   .startcard .intro-copy { margin-bottom: 26px; }
   .startcard .intro-footer { margin-top: 24px; }
 }

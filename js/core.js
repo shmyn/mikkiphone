@@ -79,15 +79,14 @@
       el("h1", { cls: "wordmark", text: "미끼폰" }),
       el("div", { cls: "intro-copy" },
         el("p", { cls: "intro-tagline", text: "나는 어떻게 낚이는 사람일까" }),
-        el("p", { text: "일상 속 피싱에 얼마나 취약한지 알아보는 시뮬레이션" })),
+        el("p", { text: "일상 속 피싱 위험에 대비하세요!" })),
       el("div", { cls: "modes" },
         btn("modebtn", experienceNames.phone, function () { MK.prepare("phone"); }, "mode-phone"),
         mobile ? null : btn("modebtn", experienceNames.pc, function () { MK.prepare("pc"); }, "mode-pc")),
-      el("footer", { cls: "intro-footer" },
+      el("div", { cls: "intro-footer" },
         el("p", { text: "약 3~5분 · 가상 체험" }),
-        mobile ? el("p", { text: "컴퓨터에서 접속하면 회사 PC 업무 체험도 할 수 있어요" }) : null,
-        el("p", { cls: "copyright", text: "© 2026 KARGI. All rights reserved." })));
-    MK.root.replaceChildren(card);
+        mobile ? el("p", { text: "컴퓨터에서 접속하면 회사 PC 업무 체험도 할 수 있어요" }) : null));
+    MK.root.replaceChildren(card, el("footer", { cls: "copyright", text: "© 2026 KARGI. All rights reserved." }));
     focusView(card);
   };
 
