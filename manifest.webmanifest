@@ -1,0 +1,10 @@
+{
+  "name": "미끼폰",
+  "short_name": "미끼폰",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#303030",
+  "theme_color": "#303030",
+  "icons": [{ "src": "og/favicon.png", "sizes": "64x64", "type": "image/png" }]
+}

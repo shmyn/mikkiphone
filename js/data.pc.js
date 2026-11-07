@@ -1100,10 +1100,10 @@
   }
 ];
 
-  var SESSION_END_SEC = 180;
+  var RECOMMENDED_SEC = 300;
   var EVENT_GAP_SEC = 8;
 
   function deepFreeze(o){ Object.getOwnPropertyNames(o).forEach(function(k){var v=o[k];if(v&&typeof v==="object")deepFreeze(v);});return Object.freeze(o); }
-  var DATA = deepFreeze({THREADS:THREADS, ITEMS:ITEMS, PAGES:PAGES, BOOKMARKS:BOOKMARKS, FILES:FILES, DOCS:DOCS, TASKS:TASKS, SESSION_END_SEC:SESSION_END_SEC, EVENT_GAP_SEC:EVENT_GAP_SEC});
+  var DATA = deepFreeze({THREADS:THREADS, ITEMS:ITEMS, PAGES:PAGES, BOOKMARKS:BOOKMARKS, FILES:FILES, DOCS:DOCS, TASKS:TASKS, RECOMMENDED_SEC:RECOMMENDED_SEC, EVENT_GAP_SEC:EVENT_GAP_SEC});
   if(typeof module!=="undefined" && module.exports)module.exports=DATA;else root.MK_PC=DATA;
 })(this);

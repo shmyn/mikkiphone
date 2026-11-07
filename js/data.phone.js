@@ -1792,10 +1792,10 @@
   }
 ];
 
-  var SESSION_END_SEC = 180;
+  var RECOMMENDED_SEC = 300;
   var EVENT_GAP_SEC = 2;
 
   function deepFreeze(o){ Object.getOwnPropertyNames(o).forEach(function(k){var v=o[k];if(v&&typeof v==="object")deepFreeze(v);});return Object.freeze(o); }
-  var DATA = deepFreeze({THREADS:THREADS, ITEMS:ITEMS, PAGES:PAGES, SEARCHES:SEARCHES, CONTACTS:CONTACTS, CALL_HISTORY:CALL_HISTORY, TASKS:TASKS, PHOTOS:PHOTOS, PLACES:PLACES, SESSION_END_SEC:SESSION_END_SEC, EVENT_GAP_SEC:EVENT_GAP_SEC});
+  var DATA = deepFreeze({THREADS:THREADS, ITEMS:ITEMS, PAGES:PAGES, SEARCHES:SEARCHES, CONTACTS:CONTACTS, CALL_HISTORY:CALL_HISTORY, TASKS:TASKS, PHOTOS:PHOTOS, PLACES:PLACES, RECOMMENDED_SEC:RECOMMENDED_SEC, EVENT_GAP_SEC:EVENT_GAP_SEC});
   if(typeof module!=="undefined" && module.exports)module.exports=DATA;else root.MK_PHONE=DATA;
 })(this);

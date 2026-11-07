@@ -47,6 +47,17 @@
     if (!P.modal && !P.popup) render();
   };
   UI.render = function () { render(); };
+  UI.browserBack = function () {
+    if (P.popup) P.popup = null;
+    else if (P.modal) P.modal = null;
+    else if (P.center || P.start) { P.center = false; P.start = false; }
+    else if (P.app === "browser" && P.browser.stack.length) {
+      var prev = P.browser.stack.pop(); P.browser.page = prev.page; P.browser.item = prev.item;
+      P.browser.clickfix = null; P.browser.dl = null;
+    } else if (P.app) P.app = null;
+    else return false;
+    render(true); return true;
+  };
   UI.refreshThread = function (id) { if (P.sel.mail === id || P.sel.chat === id) render(); };
 
   function toast(n, it) {

@@ -129,7 +129,7 @@ def preview():
     html = re.sub(r'\s*<meta http-equiv="Content-Security-Policy"[^>]*>', "", html)
     html = re.sub(r'<link rel="stylesheet" href="css/style\.css(?:\?[^"]*)?">', lambda m: f"<style>\n{css}\n</style>", html)
     html = re.sub(r'<link rel="stylesheet" href="css/apps\.css(?:\?[^"]*)?">', lambda m: "<style>\n" + (ROOT / "css/apps.css").read_text(encoding="utf-8") + "\n</style>", html)
-    html = re.sub(r'\s*<link rel="icon"[^>]*>', "", html)
+    html = re.sub(r'\s*<link rel="(?:icon|apple-touch-icon|manifest)"[^>]*>', "", html)
     html = re.sub(r'\s*<meta property="og:image"[^>]*>', "", html)
     for js in ["config", "icons", "data.common", "data.phone", "data.pc", "scoring", "core", "world", "social", "phone", "pc", "main"]:
         code = (ROOT / f"js/{js}.js").read_text(encoding="utf-8")

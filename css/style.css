@@ -26,14 +26,22 @@ button { font: inherit; color: inherit; }
 
 .stage { min-height: 100%; display: grid; place-items: center; align-content: center; gap: 12px; padding: 24px; }
 .startcard { color: #e3edf0; --ink: #e3edf0; --ink-soft: #9fb3bb; --water: #303030; }
-.session-toolbar { width: min(1100px, 100%); display: flex; align-items: center; justify-content: space-between; gap: 12px; color: #e3edf0; font-size: 13px; }
+.session-toolbar { width: min(1100px, 100%); position: relative; z-index: 70; display: flex; align-items: center; justify-content: space-between; gap: 8px; color: #e3edf0; font-size: 13px; }
 .mode-phone .session-toolbar { max-width: 390px; }
 .session-label { flex: none; }
 .session-progress { appearance: none; flex: 1; min-width: 0; height: 6px; border: 0; border-radius: 999px; overflow: hidden; background: #555; color: #dce5e9; }
 .session-progress::-webkit-progress-bar { background: #555; border-radius: 999px; }
 .session-progress::-webkit-progress-value { background: #dce5e9; border-radius: 999px; }
 .session-progress::-moz-progress-bar { background: #dce5e9; border-radius: 999px; }
-.session-finish { flex: none; border: 1px solid #666; border-radius: 8px; padding: 7px 12px; background: #252525; color: #fff; cursor: pointer; }
+.session-finish, .session-fullscreen { flex: none; border: 1px solid #666; border-radius: 8px; padding: 7px 10px; background: #252525; color: #fff; cursor: pointer; white-space: nowrap; }
+.session-fullscreen[aria-pressed="true"] { background: #e3edf0; color: #18242b; }
+.fullscreen-tip { position: absolute; z-index: 1; top: 100%; left: 8px; right: 8px; margin: 4px 0 0; padding: 12px; color: #fff; background: #25333c; border-radius: 10px; box-shadow: 0 4px 16px #0005; }
+.fullscreen-tip:empty { display: none; }
+.session-leave { position: fixed; inset: 0; z-index: 120; display: grid; place-items: center; padding: 20px; background: #0009; }
+.session-leave section { width: min(340px,100%); padding: 20px; background: var(--paper); color: var(--screen-ink); border-radius: 16px; }
+.session-leave strong { font-size: 19px; }
+.session-leave p { color: var(--screen-soft); }
+.session-leave .btn + .btn { margin-top: 8px; }
 
 /* ---------- 시작 ---------- */
 .startcard { max-width: 420px; text-align: left; }

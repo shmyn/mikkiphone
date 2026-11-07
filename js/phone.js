@@ -114,6 +114,11 @@
     render(true);
   }
   function back() { MK.S.route = MK.S.stack.pop() || { name: "home" }; render(true); }
+  UI.browserBack = function () {
+    if (P.call) return true;
+    if (MK.S.route && MK.S.route.name !== "home") { back(); return true; }
+    return false;
+  };
   function home() { go({ name: "home" }, true); }
   function setRoute(r) { rememberRoute(r); MK.S.route = r; render(); }
 

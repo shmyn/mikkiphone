@@ -12,6 +12,7 @@ function engine() {
     remove() { if (this.parentNode) this.parentNode.children = this.parentNode.children.filter(n => n !== this); }
     replaceChildren(...kids) { this.children = kids; }
     setAttribute(k, v) { this.attrs[k] = v; }
+    removeAttribute(k) { delete this.attrs[k]; }
     addEventListener(type, run) { this[type] = run; }
     focus() {}
     querySelector(selector) {
@@ -25,6 +26,7 @@ function engine() {
   const clock = { value:100 };
   const captures = [];
   let ticker;
+  const windowEvents = {};
   const document = {
     body: new Node('body'), hidden: false,
     getElementById: () => root,
@@ -40,7 +42,7 @@ function engine() {
   };
   const context = vm.createContext({ document, performance: { now: () => clock.value },
     setTimeout: (fn, at) => { timers.push({fn, at}); }, clearInterval() {}, setInterval(fn) { ticker = fn; return 1; },
-    navigator: {}, window: { MK_COMMON: require('../js/data.common'), MK_PC: require('../js/data.pc'),
+    navigator: {}, window: { addEventListener(name, fn) { windowEvents[name] = fn; }, MK_COMMON: require('../js/data.common'), MK_PC: require('../js/data.pc'),
       MK_PHONE: require('../js/data.phone'), MK_SCORING: require('../js/scoring'), MK_CONFIG: { LINE_MS:200, RING_SECONDS:15, BANNER_MS:4500 },
       Image: class { constructor(){this.naturalWidth=1200;this.naturalHeight=800;} set src(value){this.source=value;this.onload();} },
       MK_ICON: () => new Node('svg') } });
@@ -50,7 +52,11 @@ function engine() {
   const PhoneUI = MK.UI.phone;
   MK.UI.pc = { mount() {}, onDeliver() {}, render() {}, refreshThread() {} };
   MK.prepare('pc');
-  return { MK, PCUI, PhoneUI, root, timers, captures, setPortraitPhone(value) { context.window.matchMedia = () => ({ matches:value }); }, setDevice(portrait, touch, ua) { context.navigator.maxTouchPoints=touch; context.navigator.userAgent=ua; context.window.matchMedia=q=>({matches:q==="(orientation: portrait)" && portrait}); }, tick(ms) { clock.value += ms; ticker(); }, advance(ms) { clock.value+=ms; if(MK.ui.tick) MK.ui.tick(MK.now()); }, flush() { timers.splice(0).sort((a,b) => a.at-b.at).forEach(t => t.fn()); } };
+  return { MK, PCUI, PhoneUI, root, timers, captures, document, installHistory() {
+    const entries=[null];let index=0;
+    const history={get state(){return entries[index];},get length(){return entries.length;},pushState(state){entries.splice(++index,entries.length,state);},back(){if(index>0){index--;windowEvents.popstate({state:this.state});}},forward(){if(index+1<entries.length){index++;windowEvents.popstate({state:this.state});}}};
+    context.window.history=history;return history;
+  }, setPortraitPhone(value) { context.window.matchMedia = () => ({ matches:value }); }, setDevice(portrait, touch, ua) { context.navigator.maxTouchPoints=touch; context.navigator.userAgent=ua; context.window.matchMedia=q=>({matches:q==="(orientation: portrait)" && portrait}); }, tick(ms) { clock.value += ms; ticker(); }, advance(ms) { clock.value+=ms; if(MK.ui.tick) MK.ui.tick(MK.now()); }, flush() { timers.splice(0).sort((a,b) => a.at-b.at).forEach(t => t.fn()); } };
 }
 
 test('메일 요청 → 상대 답장 → 첨부 메일 순서를 유지하고 지난 답장을 되살리지 않는다', () => {
@@ -462,7 +468,7 @@ for (const dev of ['phone','pc']) {
     e.tick(1000);assert.equal(progress.attrs.value,1);
     act(root,dev==='phone'?'app-mail':'tb-mail');
     assert.equal(findNode(root,n=>n.tag==='progress'),progress);
-    assert.equal(progress.attrs.max,MK.D.SESSION_END_SEC);
+    assert.equal(progress.attrs.max,MK.S.eventEndSec);
     act(root,'finish');assert.equal(MK.S.ended,true);
     assert.ok(textOf(root).includes('결과'));
   });
@@ -477,7 +483,7 @@ test('예약 알림은 모드별 간격과 종료 시간을 지킨다', () => {
       assert.ok(MK.S.schedule[it.id]>=it.at*1000);
       if(i)assert.ok(MK.S.schedule[it.id]-MK.S.schedule[arrivals[i-1].id]>=(MK.D.EVENT_GAP_SEC||18)*1000);
     });
-    assert.ok(MK.S.schedule[arrivals.at(-1).id]<MK.D.SESSION_END_SEC*1000);
+    assert.ok(MK.S.schedule[arrivals.at(-1).id]<MK.D.RECOMMENDED_SEC*1000);
   }
 });
 
@@ -489,12 +495,12 @@ test('피싱은 정상 연락의 맥락을 만든 뒤에 배치하고 PC 경고�
   assert.ok(MK.S.schedule.s8<MK.S.schedule.L1);
   MK.prepare('pc');
   for(const [normal,fake] of [['Lp2','P2'],['Lp3','P3'],['Lp6','P5'],['Lp7','P7'],['Lp9','P8']])assert.ok(MK.S.schedule[normal]<MK.S.schedule[fake]);
-  assert.ok(MK.S.schedule.P4>=MK.D.SESSION_END_SEC*0.8*1000);
+  assert.ok(MK.S.schedule.P4>=120000);
 });
 
 
 test('휴대폰은 3분 안에 핵심 이벤트가 도착하고 피싱 사이는 16초 이상 확보한다', () => {
-  const {MK}=engine();MK.prepare('phone');assert.equal(MK.D.SESSION_END_SEC,180);
+  const {MK}=engine();MK.prepare('phone');assert.equal(MK.D.RECOMMENDED_SEC,300);
   const phish=MK.D.ITEMS.filter(it=>it.kind==='phish' && it.at!=null).sort((a,b)=>a.at-b.at);
   assert.equal(phish.length,8);
   phish.forEach((it,i)=>{if(i)assert.ok(MK.S.schedule[it.id]-MK.S.schedule[phish[i-1].id]>=16000);});
@@ -556,13 +562,15 @@ for(const dev of ['phone','pc']) {
     const nav=findNode(e.root,n=>n.className==='system-navigation');
     if(nav)assert.ok(nav.children.every(button=>textOf(button)===''));
   });
-  test(dev+' 전체 세션을 250ms씩 진행하면 모든 예약 이벤트가 제한 시간 안에 도착한다', () => {
+  test(dev+' 예약 이벤트가 모두 도착하면 결과를 안내하고 5분이 지나도 강제로 종료하지 않는다', () => {
     const e=engine(),{MK}=e;MK.UI[dev]=dev==='phone'?e.PhoneUI:e.PCUI;MK.prepare(dev);act(e.root,'start');
     const scheduled=MK.D.ITEMS.filter(it=>it.at!=null).map(it=>it.id);
-    assert.equal(MK.D.SESSION_END_SEC,180);
-    for(let elapsed=0;elapsed<MK.D.SESSION_END_SEC*1000;elapsed+=250)e.tick(250);
-    assert.equal(MK.S.ended,true);
+    assert.equal(MK.D.RECOMMENDED_SEC,300);
+    for(let elapsed=0;elapsed<MK.D.RECOMMENDED_SEC*1000;elapsed+=250)e.tick(250);
+    assert.equal(MK.S.ended,false);assert.equal(MK.S.eventsDone,true);
+    assert.ok(textOf(e.root).includes('이벤트 종료'));assert.ok(textOf(e.root).includes('결과 확인'));
     assert.deepEqual(scheduled.filter(id=>!MK.S.delivered[id]),[]);
+    act(e.root,'finish');assert.equal(MK.S.ended,true);
     assert.equal(MK.S.taskOrder.length,MK.D.TASKS.length);
   });
 }
@@ -591,4 +599,27 @@ test('택배 기사에게 경비실을 선택하면 완료 문자와 배송 조�
   clickNode(root,n=>n.tag==='button'&&n.textContent==='경비실에 맡겨 주세요');
   MK.deliver(MK.ITEM.L3);assert.ok(MK.threadLast(MK.ITEM.L3.thread).text.includes('경비실에'));
   assert.ok(textOf(MK.shopView({surface:'phone',tab:'tracking:knit',onNavigate(){}})).includes('수령 장소: 경비실'));
+});
+
+
+test('브라우저 뒤로가기는 게임 안에서 이동하고 홈에서는 나갈지 확인한다', () => {
+  const e=engine(),{MK,root}=e,h=e.installHistory();MK.UI.phone=e.PhoneUI;MK.prepare('phone');act(root,'start');
+  assert.equal(h.length,2);act(root,'app-mail');h.back();assert.equal(MK.S.route.name,'home');assert.equal(h.length,2);
+  h.back();assert.ok(textOf(root).includes('플레이를 그만할까요?'));const time=MK.S.used;e.tick(20000);assert.equal(MK.S.used,time);
+  act(root,'stay');assert.ok(!MK.S.leavePrompt);assert.equal(h.state.mikkiphonePlaying,true);
+  h.back();act(root,'leave');assert.equal(MK.S,null);assert.equal(h.state,null);assert.ok(textOf(root).includes('휴대폰 시작'));
+});
+
+test('전체 화면은 버튼으로 열고 결과로 이동하면 해제한다', async () => {
+  const e=engine(),{MK,root,document}=e;
+  document.documentElement={requestFullscreen(){document.fullscreenElement=this;return Promise.resolve();}};
+  document.exitFullscreen=()=>{document.fullscreenElement=null;return Promise.resolve();};
+  MK.UI.phone=e.PhoneUI;MK.prepare('phone');act(root,'start');act(root,'fullscreen');await new Promise(resolve=>setImmediate(resolve));
+  assert.ok(document.fullscreenElement);assert.equal(MK.S.fullscreenButton.attrs['aria-pressed'],'true');
+  act(root,'finish');assert.equal(document.fullscreenElement,null);
+});
+
+test('전체 화면을 지원하지 않는 iPhone에는 웹 앱으로 여는 방법을 안내한다', () => {
+  const e=engine(),{MK,root}=e;e.setDevice(true,5,'iPhone');MK.UI.phone=e.PhoneUI;MK.prepare('phone');act(root,'start');act(root,'fullscreen');
+  assert.ok(textOf(root).includes('홈 화면에 추가 → 웹 앱으로 열기'));assert.equal(MK.S.ended,false);
 });

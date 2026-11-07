@@ -61,6 +61,8 @@
   // ---------- 시작 화면 ----------
   MK.home = function () {
     stopTicker();
+    releaseBrowserBack();
+    leaveFullscreen();
     MK.S = null;
     document.body.className = "";
     var card = el("section", { cls: "startcard" },
@@ -70,8 +72,8 @@
       el("p", { cls: "intro-purpose", text: "일상에서 마주칠 수 있는 피싱 위험에 대한 내 취약점을 진단하는 시뮬레이션" }),
       el("p", { cls: "intro-instruction", text: "평소처럼 일상생활을 수행해보세요" }),
       el("div", { cls: "modes" },
-        btn("modebtn", "휴대폰 시작 · 3분", function () { MK.prepare("phone"); }, "mode-phone"),
-        btn("modebtn", "PC 시작 · 3분", function () { MK.prepare("pc"); }, "mode-pc")),
+        btn("modebtn", "휴대폰 시작 · 약 5분", function () { MK.prepare("phone"); }, "mode-phone"),
+        btn("modebtn", "PC 시작 · 약 5분", function () { MK.prepare("pc"); }, "mode-pc")),
       el("p", { cls: "fineprint", text: "가상 대화 · 실제 설치·전송 없음 · 진행 중 언제든 끝내고 결과 확인 가능" }),
       el("p", { cls: "copyright", text: "© 2026 KARGI. All rights reserved." }));
     MK.root.replaceChildren(card);
@@ -93,10 +95,12 @@
     // 모드별 시간표 간격을 보장한다. 폰은 주요 피싱 사이에 일반 연락을 배치한다.
     var gap = MK.D.EVENT_GAP_SEC || 18;
     var lastArrival = -gap;
-    MK.D.ITEMS.filter(function (it) { return it.at != null; }).sort(function (a, b) { return a.at - b.at; }).forEach(function (it) {
+    S.scheduledItems = MK.D.ITEMS.filter(function (it) { return it.at != null; }).sort(function (a, b) { return a.at - b.at; });
+    S.scheduledItems.forEach(function (it) {
       lastArrival = Math.max(it.at, lastArrival + gap);
       S.schedule[it.id] = lastArrival * 1000;
     });
+    S.eventEndSec = Math.max(1, lastArrival);
     MK.D.ITEMS.forEach(function (it) {
       S.st[it.id] = { opened: false, openedAt: null, arrivedAt: null, result: "safe", risky: false, rtMs: 0,
         verify: false, reported: false, handled: false, blocked: false,
@@ -112,13 +116,74 @@
     if (S.running || MK.orientationBlocked()) { MK.syncOrientation(); return; }
     S.running = true;
     S.last = performance.now();
-    S.progress = el("progress", { cls: "session-progress", attrs: { max: MK.D.SESSION_END_SEC, value: 0, "aria-label": "시뮬레이션 진행도" } });
+    S.progress = el("progress", { cls: "session-progress", attrs: { max: S.eventEndSec, value: 0, "aria-label": "이벤트 진행도" } });
+    S.progressLabel = el("span", { cls: "session-label", text: "진행", attrs: { role: "status" } });
+    S.finishButton = btn("session-finish", "끝내고 결과 보기", MK.finish, "finish");
+    S.fullscreenButton = btn("session-fullscreen", "전체 화면", toggleFullscreen, "fullscreen");
+    S.fullscreenButton.setAttribute("aria-pressed", "false");
+    S.fullscreenTip = el("p", { cls: "fullscreen-tip", attrs: { role: "status" } });
     var toolbar = el("div", { cls: "session-toolbar", attrs: { "aria-label": "시뮬레이션 진행" } },
-      el("span", { cls: "session-label", text: "진행" }), S.progress, btn("session-finish", "끝내고 결과 보기", MK.finish, "finish"));
+      S.progressLabel, S.progress, S.fullscreenButton, S.finishButton, S.fullscreenTip);
     MK.root.replaceChildren.apply(MK.root, [toolbar].concat(Array.prototype.slice.call(MK.root.children)));
+    armBrowserBack();
+    syncFullscreen();
     S.ticker = setInterval(tick, 250);
   };
   function stopTicker() { if (MK.S && MK.S.ticker) clearInterval(MK.S.ticker); }
+
+  function fullscreenActive() { return document.fullscreenElement || document.webkitFullscreenElement; }
+  function syncFullscreen() {
+    if (MK.S && MK.S.fullscreenButton) MK.S.fullscreenButton.setAttribute("aria-pressed", String(!!fullscreenActive()));
+  }
+  function leaveFullscreen() {
+    var exit = document.exitFullscreen || document.webkitExitFullscreen;
+    if (fullscreenActive() && exit) { try { Promise.resolve(exit.call(document)).catch(function () {}); } catch (e) {} }
+  }
+  function toggleFullscreen() {
+    var S = MK.S, target = document.documentElement;
+    S.fullscreenTip.textContent = "";
+    if (fullscreenActive()) { leaveFullscreen(); return; }
+    function unavailable() {
+      if (MK.S !== S || S.ended) return;
+      S.fullscreenTip.textContent = /iPhone|iPad|iPod/i.test(navigator.userAgent || "") || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1)
+        ? "Safari에서 공유 → 홈 화면에 추가 → 웹 앱으로 열기를 선택하면 주소창 없이 플레이할 수 있어요"
+        : "이 브라우저에서는 전체 화면을 열 수 없어요. 게임 안의 뒤로 버튼으로 이동할 수 있어요";
+      later(8000, function () { S.fullscreenTip.textContent = ""; });
+    }
+    var request = target && (target.requestFullscreen || target.webkitRequestFullscreen);
+    if (!request) { unavailable(); return; }
+    try { Promise.resolve(request.call(target)).then(syncFullscreen, unavailable); } catch (e) { unavailable(); }
+  }
+  document.addEventListener("fullscreenchange", syncFullscreen);
+  document.addEventListener("webkitfullscreenchange", syncFullscreen);
+
+  // One same-page history entry during play. Back remains available outside the game.
+  function browserMarker(state) { return !!(state && state.mikkiphonePlaying); }
+  function armBrowserBack() {
+    var h = window.history;
+    if (!h || !h.pushState) return;
+    try { if (!browserMarker(h.state)) h.pushState({ mikkiphonePlaying: true }, ""); MK.S.backGuard = true; } catch (e) {}
+  }
+  function releaseBrowserBack() {
+    if (!MK.S || !MK.S.backGuard) return;
+    MK.S.backGuard = false;
+    if (window.history && browserMarker(window.history.state)) window.history.back();
+  }
+  function browserBack(event) {
+    var S = MK.S, h = window.history;
+    if (!S || !S.running || S.ended || !S.backGuard || browserMarker(event.state) || S.leavePrompt) return;
+    if (MK.ui.browserBack && MK.ui.browserBack()) { h.forward(); return; }
+    var behind = Array.prototype.slice.call(MK.root.children);
+    behind.forEach(function (node) { node.setAttribute("inert", ""); });
+    S.leavePrompt = el("div", { cls: "session-leave" }, el("section", { attrs: { role: "alertdialog", "aria-modal": "true", "aria-label": "플레이 종료 확인" } },
+      el("strong", { text: "플레이를 그만할까요?" }),
+      el("p", { text: "처음 화면으로 돌아가면 지금 진행 내용은 사라져요" }),
+      btn("btn", "계속하기", function () { S.leavePrompt.remove(); S.leavePrompt = null; behind.forEach(function (node) { node.removeAttribute("inert"); }); S.last = performance.now(); h.forward(); S.finishButton.focus(); }, "stay"),
+      btn("btn ghost", "처음 화면으로", MK.home, "leave")));
+    MK.root.appendChild(S.leavePrompt);
+    MK.focusView(S.leavePrompt);
+  }
+  if (window.addEventListener) window.addEventListener("popstate", browserBack);
 
   MK.orientationBlocked = function () {
     return MK.dev === "pc" && !!window.matchMedia && window.matchMedia("(orientation: portrait)").matches &&
@@ -127,21 +192,25 @@
   };
   MK.syncOrientation = function () { document.body.setAttribute("data-pc-portrait", String(MK.orientationBlocked())); };
   if (window.addEventListener) window.addEventListener("resize", MK.syncOrientation);
-  MK.now = function () { var S = MK.S; return S.used + (document.hidden || MK.orientationBlocked() ? 0 : performance.now() - S.last); };
+  MK.now = function () { var S = MK.S; return S.used + (document.hidden || MK.orientationBlocked() || S.leavePrompt ? 0 : performance.now() - S.last); };
   function tick() {
     var S = MK.S, p = performance.now();
-    if (!document.hidden && !MK.orientationBlocked()) S.used += p - S.last;
+    if (!document.hidden && !MK.orientationBlocked() && !S.leavePrompt) S.used += p - S.last;
     S.last = p;
     var t = S.used;
-    MK.D.ITEMS.forEach(function (it) {
-      if (it.at == null || S.delivered[it.id] || S.schedule[it.id] > t) return;
+    S.scheduledItems.forEach(function (it) {
+      if (S.delivered[it.id] || S.schedule[it.id] > t) return;
       if (MK.ui.canDeliver && !MK.ui.canDeliver(it)) return;
       MK.deliver(it);
     });
     if (MK.ui.tick) MK.ui.tick(t);
     if (MK.revealTasks(t)) MK.ui.render();
-    S.progress.setAttribute("value", Math.min(MK.D.SESSION_END_SEC, t / 1000));
-    if (t >= MK.D.SESSION_END_SEC * 1000) MK.finish();
+    if (!S.eventsDone && S.scheduledItems.every(function (it) { return S.delivered[it.id]; })) {
+      S.eventsDone = true;
+      S.progressLabel.textContent = "이벤트 종료";
+      S.finishButton.textContent = "결과 확인";
+    }
+    S.progress.setAttribute("value", S.eventsDone ? S.eventEndSec : Math.min(S.eventEndSec - 0.25, t / 1000));
   }
   document.addEventListener("visibilitychange", function () { if (MK.S) MK.S.last = performance.now(); });
 
@@ -342,6 +411,8 @@
     if (!S || S.ended) return;
     stopTicker();
     S.ended = true;
+    releaseBrowserBack();
+    leaveFullscreen();
     var recs = [];
     MK.D.ITEMS.forEach(function (it) {
       if (!S.delivered[it.id] || it.kind === "ambient") return;
