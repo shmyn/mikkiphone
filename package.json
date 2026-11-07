@@ -6,5 +6,5 @@
     "test": "node --test tests/*.test.js",
     "build": "python3 scripts/build.py"
   },
-  "license": "MIT"
+  "license": "UNLICENSED"
 }

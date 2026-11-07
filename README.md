@@ -91,7 +91,9 @@ git add . && git commit -m "deploy" && git push
 
 ## 라이선스
 
-MIT. 수화기 아이콘 모양은 Google Material Icons(Apache License 2.0)의 call 아이콘 경로를 사용했습니다. 나머지 도구 아이콘은 직접 그렸으며, 브랜드 표지·사진의 출처와 조건은 ASSET_CREDITS.md에 정리했습니다.
+© 2026 KARGI. All rights reserved. 저작권 고지를 유지하더라도 KARGI의 사전 허락 없이 이 프로젝트의 자체 코드를 수정하거나 재배포할 수 없습니다. 외부 에셋에는 각 권리자의 사용 조건이 적용됩니다.
+
+수화기 아이콘 모양은 Google Material Icons(Apache License 2.0)의 call 아이콘 경로를 사용했습니다. 나머지 도구 아이콘은 직접 그렸으며, 브랜드 표지·사진의 출처와 조건은 ASSET_CREDITS.md에 정리했습니다.
 
 ## 대화 흐름·결과 화면 개선
 
