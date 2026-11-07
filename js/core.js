@@ -234,7 +234,8 @@
       S.eventsDone = true;
       S.progressLabel.textContent = "이벤트 종료";
     }
-    if (S.eventsDone && !S.resultsOffered && !S.leavePrompt && !document.hidden && !blocked) offerResults(S);
+    var resultDelay = MK.dev === "pc" ? 8000 : 0;
+    if (S.eventsDone && !S.resultsOffered && !S.leavePrompt && !document.hidden && !blocked && t >= S.eventEndSec * 1000 + resultDelay) offerResults(S);
     S.progress.setAttribute("value", S.eventsDone ? S.eventEndSec : Math.min(S.eventEndSec - 0.25, t / 1000));
   }
   document.addEventListener("visibilitychange", function () { if (MK.S) MK.S.last = performance.now(); });

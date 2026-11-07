@@ -371,7 +371,7 @@
   {
     "id": "Lp1",
     "kind": "legit",
-    "at": 3,
+    "at": 0,
     "title": "팀장 업무 메시지",
     "channel": "chat",
     "thread": "pc_park",
@@ -388,7 +388,7 @@
   {
     "id": "Lp2",
     "kind": "legit",
-    "at": 11,
+    "at": 8,
     "title": "거래처 견적서 메일",
     "channel": "mail",
     "thread": "pm_partner",
@@ -417,7 +417,7 @@
     "kind": "phish",
     "verified": true,
     "source": "기업 담당자 대상 압축 파일 속 바로가기 실행 스피어피싱(탐색 주간 보도)",
-    "at": 21,
+    "at": 18,
     "title": "견적서 수정본 압축 파일",
     "channel": "mail",
     "thread": "pm_p2",
@@ -451,7 +451,7 @@
   {
     "id": "Ap1",
     "kind": "ambient",
-    "at": 29,
+    "at": 27,
     "channel": "mail",
     "thread": "pm_letter",
     "subject": "일요일에 읽고 싶은 다섯 페이지",
@@ -460,7 +460,7 @@
   {
     "id": "Lp5",
     "kind": "legit",
-    "at": 37,
+    "at": 36,
     "title": "동료 점심 메시지",
     "channel": "chat",
     "thread": "pc_kim",
@@ -516,7 +516,7 @@
   {
     "id": "Lp3",
     "kind": "legit",
-    "at": 62,
+    "at": 63,
     "title": "IT지원팀 보안 공지",
     "channel": "mail",
     "thread": "pm_it",
@@ -579,7 +579,7 @@
     "id": "P5",
     "kind": "phish",
     "verified": false,
-    "at": 91,
+    "at": 100,
     "title": "지인 새 계정 사진 링크",
     "channel": "chat",
     "thread": "pc_p5",
@@ -604,7 +604,7 @@
   {
     "id": "Lp4",
     "kind": "legit",
-    "at": 100,
+    "at": 110,
     "title": "업데이트 재시작 필요",
     "channel": "toast",
     "source": "Windows 업데이트",
@@ -622,7 +622,7 @@
   {
     "id": "Ap2",
     "kind": "ambient",
-    "at": 127,
+    "at": 140,
     "channel": "chat",
     "thread": "pc_group",
     "body": "오늘 15시~16시 엘리베이터 점검 있습니다."
@@ -631,7 +631,7 @@
     "id": "P7",
     "kind": "phish",
     "verified": false,
-    "at": 119,
+    "at": 130,
     "title": "팀장 사칭 상품권 요청",
     "channel": "mail",
     "thread": "pm_p7",
@@ -680,7 +680,7 @@
   {
     "id": "Lp9",
     "kind": "legit",
-    "at": 135,
+    "at": 150,
     "title": "인사팀 연말정산 안내",
     "channel": "mail",
     "thread": "pm_hr",
@@ -691,7 +691,7 @@
     "id": "P8",
     "kind": "phish",
     "verified": false,
-    "at": 145,
+    "at": 160,
     "title": "인사 문서 열람 로그인",
     "channel": "mail",
     "thread": "pm_p8",
@@ -718,7 +718,7 @@
   {
     "id": "Lp8",
     "kind": "legit",
-    "at": 153,
+    "at": 170,
     "title": "쿠팡 출고 메일",
     "channel": "mail",
     "thread": "pm_moamall",
@@ -729,7 +729,7 @@
     "id": "P4",
     "kind": "phish",
     "verified": false,
-    "at": 163,
+    "at": 90,
     "title": "가짜 감염 경고창",
     "channel": "popup",
     "popup": {
@@ -748,7 +748,7 @@
       "ask_it_p4"
     ],
     "redFlags": [
-      "브라우저 안에 뜬 ‘감염’ 경고",
+      "낯선 웹 주소가 붙은 ‘감염’ 경고",
       "즉시 전화 유도",
       "원격 지원 프로그램 설치 요구"
     ]
@@ -756,14 +756,15 @@
   {
     "id": "Lp7",
     "kind": "legit",
-    "at": 109,
+    "at": 120,
     "title": "회의 일정 알림",
     "channel": "toast",
     "source": "캘린더",
     "body": "오늘 15:00 주간 회의 장소 · 2번 회의실",
     "actions": [
       {
-        "label": "확인"
+        "label": "확인",
+        "open": "calendar"
       }
     ]
   },

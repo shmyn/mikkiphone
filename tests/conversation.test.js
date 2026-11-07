@@ -503,14 +503,16 @@ test('예약 알림은 모드별 간격과 종료 시간을 지킨다', () => {
 });
 
 
-test('피싱은 정상 연락의 맥락을 만든 뒤에 배치하고 PC 경고는 후반으로 보낸다', () => {
+test('피싱은 정상 연락의 맥락을 만든 뒤에 배치하고 PC 경고 뒤에도 이벤트가 이어진다', () => {
   const {MK}=engine();MK.prepare('phone');
   for(const [normal,fake] of [['L9','s1'],['L5','s5'],['L8','s8'],['L6','s6']])assert.ok(MK.S.schedule[normal]<MK.S.schedule[fake]);
   assert.ok(MK.S.schedule.s8<90000);
   assert.ok(MK.S.schedule.s8<MK.S.schedule.L1);
   MK.prepare('pc');
   for(const [normal,fake] of [['Lp2','P2'],['Lp3','P3'],['Lp6','P5'],['Lp7','P7'],['Lp9','P8']])assert.ok(MK.S.schedule[normal]<MK.S.schedule[fake]);
-  assert.ok(MK.S.schedule.P4>=120000);
+  assert.equal(MK.S.schedule.Lp1,0);
+  assert.ok(MK.S.schedule.P4>=75000 && MK.S.schedule.P4<=105000);
+  assert.ok(MK.S.schedule.Lp8-MK.S.schedule.P4>=60000);
 });
 
 
@@ -555,7 +557,9 @@ test('PC 감염 팝업은 바탕화면에서도 나오며 업데이트 미션은
   MK.deliver(MK.ITEM.Lp4);clickNode(root,n=>n.tag==='button'&&n.textContent==='Windows 업데이트 열기');
   assert.ok(textOf(root).includes('재시작 필요'));assert.equal(MK.S.tasks.t5,undefined);
   act(root,'update');assert.equal(MK.S.tasks.t5,true);assert.ok(textOf(root).includes('오늘 22:00 재시작 예약됨'));
-  act(root,'tb-calendar');act(root,'calendar-confirm');assert.equal(MK.S.tasks.t4,true);
+  MK.deliver(MK.ITEM.Lp7);
+  clickNode(root,n=>n.attrs?.['data-act']==='toast-act' && n.textContent==='확인');
+  act(root,'calendar-confirm');assert.equal(MK.S.tasks.t4,true);
 });
 
 
@@ -574,13 +578,15 @@ for(const dev of ['phone','pc']) {
     const e=engine(),{MK}=e;MK.UI[dev]=dev==='phone'?e.PhoneUI:e.PCUI;MK.prepare(dev);act(e.root,'start');
     const scheduled=MK.D.ITEMS.filter(it=>it.at!=null).map(it=>it.id);
     assert.equal(MK.D.RECOMMENDED_SEC,300);
-    for(let elapsed=0;elapsed<180000;elapsed+=250)e.tick(250);
-    if(dev==='pc') {
-      assert.ok(findNode(e.root,n=>n.className==='scam-popup'));
-      assert.ok(!MK.S.eventsDone);
-      assert.ok(!MK.S.resultPrompt);
-      act(e.root,'popup-close');
+    for(let elapsed=250;elapsed<=180000;elapsed+=250){
       e.tick(250);
+      if(dev==='pc' && elapsed===MK.S.schedule.P4) {
+        assert.ok(findNode(e.root,n=>n.className==='scam-popup'));
+        assert.ok(!MK.S.eventsDone);
+        assert.ok(!MK.S.resultPrompt);
+        act(e.root,'popup-close');
+      }
+      if(dev==='pc' && elapsed===MK.S.schedule.Lp8) assert.ok(!MK.S.resultPrompt);
     }
     assert.equal(MK.S.ended,false);assert.equal(MK.S.eventsDone,true);
     assert.ok(textOf(e.root).includes('결과를 확인할까요?'));

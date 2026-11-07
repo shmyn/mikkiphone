@@ -85,12 +85,12 @@
     var it = MK.ITEM[n.id];
     P.center = false;
     if (n.app === "mail" || n.app === "chat") { P.app = n.app; P.sel[n.app] = it.thread; }
-    else { MK.markOpened(it); if (it.id === "Lp4") P.app = "settings"; }
+    else { MK.markOpened(it); if (it.id === "Lp4") P.app = "settings"; else if (it.id === "Lp7") P.app = "calendar"; }
     render(true);
   }
   function notificationAction(it, action) {
     MK.markOpened(it);
-    if (action.open === "settings") { P.app = "settings"; P.center = false; }
+    if (action.open) { openApp(action.open); return; }
     render(true);
   }
 
