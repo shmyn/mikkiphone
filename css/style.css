@@ -61,7 +61,6 @@ button { font: inherit; color: inherit; }
 .result-home .bobber { width: 15px; height: 23px; margin-top: 7px; box-shadow: inset 0 0 0 1px var(--ink); }
 .result-home .bobber::before { top: -7px; width: 1px; height: 7px; }
 .wordmark { font-size: 72px; line-height: 1; letter-spacing: -0.04em; font-weight: 800; margin: 18px 0 10px; }
-.lede { font-size: 20px; margin: 0 0 28px; }
 .modes { display: grid; gap: 10px; }
 .modebtn { padding: 18px 20px; border-radius: 16px; border: 0; cursor: pointer; background: var(--ink); color: var(--water); font-size: 18px; font-weight: 700; text-align: left; }
 a.modebtn { text-decoration: none; }
@@ -552,20 +551,19 @@ a.modebtn { text-decoration: none; }
   body.mode-pc .stage:has(.session-toolbar) .pc-screen { height: 100%; }
 }
 
-.intro-purpose { font-size:15px; line-height:1.7; color:#c8d2d8; margin:0 0 18px; }
-.intro-instruction { font-size:16px; margin:0 0 18px; }
-.copyright { color:#aab6bd; font-size:11px; margin:18px 0 0; }
-
+.intro-copy { display: grid; gap: 6px; margin-bottom: 22px; font-size: 16px; line-height: 1.6; color: #c8d2d8; }
+.intro-copy p, .intro-footer p { margin: 0; }
+.intro-copy .intro-tagline { font-weight: 700; color: var(--ink); }
+.intro-footer { display: grid; gap: 6px; margin-top: 16px; font-size: 13px; color: #bac6cc; }
+.intro-footer .copyright { margin-top: 6px; }
 
 /* Start/result pages keep their own mobile gutters instead of inheriting full-screen phone rules. */
 body:not(.mode-phone):not(.mode-pc) .stage { padding:max(28px,env(safe-area-inset-top)) max(22px,env(safe-area-inset-right)) max(28px,env(safe-area-inset-bottom)) max(22px,env(safe-area-inset-left)); grid-template-columns:minmax(0,1fr); }
 .startcard { width:min(420px,100%); min-width:0; padding:0; margin:auto; }
 .startcard .wordmark { font-size:clamp(52px,16vw,72px); }
-.startcard .intro-purpose,.startcard .fineprint { word-break:keep-all; overflow-wrap:break-word; }
+.intro-copy, .intro-footer { word-break:keep-all; overflow-wrap:break-word; }
 .startcard .modes { width:100%; }
 @media (max-width:420px) {
-  .startcard .lede { font-size:18px; margin-bottom:20px; }
-  .startcard .intro-purpose { font-size:14px; }
   .startcard .modebtn { padding:16px 18px; }
 }
 
