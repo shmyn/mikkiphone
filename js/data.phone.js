@@ -416,7 +416,7 @@
   {
     "id": "L2",
     "kind": "legit",
-    "at": 4,
+    "at": 3,
     "title": "쿠팡 배송 시작 알림",
     "channel": "push",
     "app": "moamall",
@@ -427,7 +427,7 @@
     "id": "L9",
     "quiet": true,
     "kind": "legit",
-    "at": 8,
+    "at": 7,
     "title": "CJ대한통운 배송 출발 문자",
     "channel": "sms",
     "thread": "hanbit",
@@ -437,7 +437,7 @@
     "id": "s1",
     "kind": "phish",
     "verified": false,
-    "at": 22,
+    "at": 16,
     "title": "국제발신 택배 문자",
     "channel": "sms",
     "thread": "t_s1",
@@ -463,7 +463,7 @@
   {
     "id": "L1",
     "kind": "legit",
-    "at": 114,
+    "at": 93,
     "title": "지수 약속 메시지",
     "channel": "talk",
     "thread": "k_jisu",
@@ -502,7 +502,7 @@
     "kind": "phish",
     "verified": true,
     "source": "KISA ‘개인정보 유출 보상금’ 미끼 스미싱 경고",
-    "at": 42,
+    "at": 32,
     "title": "유출 보상금 문자",
     "channel": "sms",
     "thread": "t_s2",
@@ -528,7 +528,7 @@
   {
     "id": "L5",
     "kind": "legit",
-    "at": 32,
+    "at": 23,
     "title": "엄마 전화",
     "channel": "call",
     "caller": "엄마",
@@ -586,7 +586,7 @@
   {
     "id": "A2",
     "kind": "ambient",
-    "at": 70,
+    "at": 55,
     "channel": "talk",
     "thread": "k_group",
     "body": "금요일 7시 강남역 어때?",
@@ -608,7 +608,7 @@
     "id": "s5",
     "kind": "phish",
     "verified": false,
-    "at": 62,
+    "at": 48,
     "title": "가족 사칭 메신저",
     "channel": "talk",
     "thread": "k_s5",
@@ -658,7 +658,7 @@
   {
     "id": "L6",
     "kind": "legit",
-    "at": 92,
+    "at": 75,
     "title": "서연 청첩장",
     "channel": "talk",
     "thread": "k_seoyeon",
@@ -683,7 +683,7 @@
     "id": "s6",
     "kind": "phish",
     "verified": false,
-    "at": 102,
+    "at": 84,
     "title": "모바일 청첩장 문자",
     "channel": "sms",
     "thread": "t_s6",
@@ -710,7 +710,7 @@
     "kind": "phish",
     "verified": true,
     "source": "계좌 보호 명목 원격제어 앱 설치 요구 수법(경찰 안내)",
-    "at": 142,
+    "at": 124,
     "title": "수사기관 사칭 전화",
     "channel": "call",
     "caller": "02-●●●-1130",
@@ -797,7 +797,7 @@
     "id": "L7",
     "quiet": true,
     "kind": "legit",
-    "at": 118,
+    "at": 97,
     "title": "무신사 주문 메일",
     "channel": "mail",
     "thread": "m_nuri",
@@ -809,7 +809,7 @@
     "kind": "phish",
     "verified": true,
     "source": "11/2 일본 노지마 유출 후 비밀번호 강제 초기화 사례 변형",
-    "at": 122,
+    "at": 102,
     "title": "비밀번호 초기화 메일",
     "channel": "mail",
     "thread": "m_s7",
@@ -872,7 +872,7 @@
     "kind": "phish",
     "verified": true,
     "source": "금융사 사칭 금리·한도 조정 제안(경찰 주의보)",
-    "at": 162,
+    "at": 146,
     "title": "저금리 대출 문자",
     "channel": "sms",
     "thread": "t_s3",
@@ -898,7 +898,7 @@
   {
     "id": "L10",
     "kind": "legit",
-    "at": 132,
+    "at": 108,
     "title": "택배 기사 전화(010)",
     "channel": "call",
     "caller": "010-●●●●-5521",
@@ -914,11 +914,13 @@
           "choices": [
             {
               "label": "문 앞에 두세요",
-              "to": "b"
+              "to": "b",
+              "deliveryPlace": "door"
             },
             {
               "label": "경비실에 맡겨 주세요",
-              "to": "b"
+              "to": "b",
+              "deliveryPlace": "guard"
             }
           ]
         },
@@ -935,7 +937,7 @@
     "id": "L3",
     "quiet": true,
     "kind": "legit",
-    "at": 138,
+    "at": 136,
     "title": "CJ대한통운 배송 완료 문자",
     "channel": "sms",
     "thread": "hanbit",
@@ -944,7 +946,7 @@
   {
     "id": "L8",
     "kind": "legit",
-    "at": 74,
+    "at": 60,
     "title": "토스 체크카드 결제 문자",
     "channel": "sms",
     "thread": "daon",
@@ -955,7 +957,7 @@
     "kind": "phish",
     "verified": true,
     "source": "KISA 검색 상단 광고 악용 피싱 사이트 수법",
-    "at": 82,
+    "at": 66,
     "title": "분실 신고 검색 광고",
     "channel": "task",
     "body": "어? 방금 모르는 결제 문자가 왔는데 지갑이 없다. 카드 분실 신고부터 하자.",

@@ -12,7 +12,7 @@
   var UI = MK.UI.phone = {};
 
   UI.mount = function () {
-    P = { call: null, bankAuth: "idle", recentRoutes: [], recent: MK.D.CALL_HISTORY.map(function (c) { return { name: c.name, label: c.label, seen: true }; }),
+    P = { call: null, deliveryPlace: null, bankAuth: "idle", recentRoutes: [], recent: MK.D.CALL_HISTORY.map(function (c) { return { name: c.name, label: c.label, seen: true }; }),
       photos: MK.D.PHOTOS.map(function (ph) { return Object.assign({}, ph); }), camera: { scene: "workspace", zoom: 1, flash: false, capturing: false }, threadMenu: null, threadLinks: null, threadScroll: {}, place: null, settings: { wifi: true, bt: false, dnd: false } };
     statusEl = el("div", { cls: "status" });
     hostEl = el("div", { cls: "host" });
@@ -44,7 +44,11 @@
   }
 
   // ---------- 엔진 연결 ----------
-  UI.canDeliver = function (it) { return !(it.channel === "call" && P.call); };
+  UI.canDeliver = function (it) {
+    return !(P.call && (it.channel === "call" || (it.id === "L3" && P.call.item === MK.ITEM.L10 && !P.deliveryPlace)));
+  };
+  UI.itemBody = function (it) { return it.id === "L3" && P.deliveryPlace === "guard" ? it.body.replace("문 앞에", "경비실에") : it.body; };
+  UI.deliveryLocation = function () { return P.deliveryPlace === "guard" ? "경비실" : "문 앞"; };
   UI.onDeliver = function (it) {
     if (it.channel === "call") { startIncoming(it); return; }
     if (it.channel === "task") {
@@ -53,7 +57,7 @@
     } else if (!it.quiet) {
       var th = it.thread ? MK.D.THREADS[it.thread] : null;
       var app = th ? th.app : it.app;
-      banner(app, it.subject || (th ? th.name : it.sender), MK.cleanText(it.body), function () { openItem(it); });
+      banner(app, it.subject || (th ? th.name : it.sender), MK.cleanText(MK.itemBody(it)), function () { openItem(it); });
     }
     var r = MK.S.route && MK.S.route.name;
     if (!P.call && (r === "home" || r === "app" || (r === "thread" && MK.S.route.id === it.thread))) render();
@@ -289,7 +293,7 @@
         } else link.appendChild(el("strong", { text: it.link.text }));
         link.appendChild(el("small", { text: it.link.text }));
       }
-      message(MK.cleanText(it.body), false, entry.when || MK.clockText(), link, it.sender);
+      message(MK.cleanText(MK.itemBody(it)), false, entry.when || MK.clockText(), link, it.sender);
     });
     v.appendChild(c);
     var position = P.threadScroll[id], count = (MK.S.timeline[id] || []).length;
@@ -598,6 +602,7 @@
     var c = P.call;
     if (!c || c.queue.length || !MK.choiceAvailable(ch) || !c.dialog.nodes[c.node].choices || c.dialog.nodes[c.node].choices.indexOf(ch) < 0) return;
     c.lines.push({ me: true, text: ch.label });
+    if (ch.deliveryPlace) P.deliveryPlace = ch.deliveryPlace;
     if (c.item) { if (ch.effect === "exposed") MK.expose(c.item); else if (ch.effect === "handled") MK.handle(c.item); }
     if (ch.verify) MK.verify(ch.verify);
     if (ch.task) MK.doneTask(ch.task);

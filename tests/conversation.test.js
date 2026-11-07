@@ -50,7 +50,7 @@ function engine() {
   const PhoneUI = MK.UI.phone;
   MK.UI.pc = { mount() {}, onDeliver() {}, render() {}, refreshThread() {} };
   MK.prepare('pc');
-  return { MK, PCUI, PhoneUI, root, timers, captures, setPortraitPhone(value) { context.window.matchMedia = () => ({ matches:value }); }, tick(ms) { clock.value += ms; ticker(); }, advance(ms) { clock.value+=ms; if(MK.ui.tick) MK.ui.tick(MK.now()); }, flush() { timers.splice(0).sort((a,b) => a.at-b.at).forEach(t => t.fn()); } };
+  return { MK, PCUI, PhoneUI, root, timers, captures, setPortraitPhone(value) { context.window.matchMedia = () => ({ matches:value }); }, setDevice(portrait, touch, ua) { context.navigator.maxTouchPoints=touch; context.navigator.userAgent=ua; context.window.matchMedia=q=>({matches:q==="(orientation: portrait)" && portrait}); }, tick(ms) { clock.value += ms; ticker(); }, advance(ms) { clock.value+=ms; if(MK.ui.tick) MK.ui.tick(MK.now()); }, flush() { timers.splice(0).sort((a,b) => a.at-b.at).forEach(t => t.fn()); } };
 }
 
 test('메일 요청 → 상대 답장 → 첨부 메일 순서를 유지하고 지난 답장을 되살리지 않는다', () => {
@@ -493,11 +493,11 @@ test('피싱은 정상 연락의 맥락을 만든 뒤에 배치하고 PC 경고�
 });
 
 
-test('휴대폰은 3분 안에 핵심 이벤트가 도착하고 피싱 사이는 18초 이상 확보한다', () => {
+test('휴대폰은 3분 안에 핵심 이벤트가 도착하고 피싱 사이는 16초 이상 확보한다', () => {
   const {MK}=engine();MK.prepare('phone');assert.equal(MK.D.SESSION_END_SEC,180);
   const phish=MK.D.ITEMS.filter(it=>it.kind==='phish' && it.at!=null).sort((a,b)=>a.at-b.at);
   assert.equal(phish.length,8);
-  phish.forEach((it,i)=>{if(i)assert.ok(MK.S.schedule[it.id]-MK.S.schedule[phish[i-1].id]>=18000);});
+  phish.forEach((it,i)=>{if(i)assert.ok(MK.S.schedule[it.id]-MK.S.schedule[phish[i-1].id]>=16000);});
   assert.ok(MK.S.schedule.s8<=164000);
   assert.deepEqual(MK.D.ITEMS.filter(it=>it.kind==='ambient' && it.at!=null).map(it=>it.id),['A2']);
 });
@@ -512,8 +512,8 @@ test('모바일 PC 모드를 세로로 돌린 동안에는 세션 시간을 멈�
 
 test('휴대폰은 배송 안내로 시작하고 카드 분실은 중반, 지수 연락은 후반에 도착한다', () => {
   const e=engine(),{MK,root}=e;MK.UI.phone=e.PhoneUI;MK.prepare('phone');act(root,'start');
-  e.tick(4000);assert.equal(MK.S.delivered.L2,true);assert.equal(MK.S.delivered.s4,undefined);
-  e.tick(78000);assert.equal(MK.S.tasks.t4visible,true);assert.equal(MK.S.delivered.L1,undefined);
+  e.tick(3000);assert.equal(MK.S.delivered.L2,true);assert.equal(MK.S.delivered.s4,undefined);
+  e.tick(63000);assert.equal(MK.S.tasks.t4visible,true);assert.equal(MK.S.delivered.L1,undefined);
   assert.equal(MK.D.TASKS.at(-2).id,'t1');assert.equal(MK.D.TASKS.length,6);
 });
 
@@ -538,7 +538,9 @@ test('PC 감염 팝업은 브라우저를 사용할 때만 나오며 업데이�
   assert.ok(!findNode(root,n=>n.className==='scam-popup'));act(root,'desk-browser');assert.equal(MK.S.st.P4.opened,true);
   act(root,'popup-close');
   MK.deliver(MK.ITEM.Lp3);MK.markOpened(MK.ITEM.Lp3);assert.equal(MK.S.tasks.t5,undefined);
-  MK.deliver(MK.ITEM.Lp4);act(root,'tb-settings');act(root,'update');assert.equal(MK.S.tasks.t5,true);
+  MK.deliver(MK.ITEM.Lp4);clickNode(root,n=>n.tag==='button'&&n.textContent==='Windows 업데이트 열기');
+  assert.ok(textOf(root).includes('재시작 필요'));assert.equal(MK.S.tasks.t5,undefined);
+  act(root,'update');assert.equal(MK.S.tasks.t5,true);assert.ok(textOf(root).includes('오늘 22:00 재시작 예약됨'));
   act(root,'tb-calendar');act(root,'calendar-confirm');assert.equal(MK.S.tasks.t4,true);
 });
 
@@ -557,10 +559,36 @@ for(const dev of ['phone','pc']) {
   test(dev+' 전체 세션을 250ms씩 진행하면 모든 예약 이벤트가 제한 시간 안에 도착한다', () => {
     const e=engine(),{MK}=e;MK.UI[dev]=dev==='phone'?e.PhoneUI:e.PCUI;MK.prepare(dev);act(e.root,'start');
     const scheduled=MK.D.ITEMS.filter(it=>it.at!=null).map(it=>it.id);
-    assert.equal(MK.D.SESSION_END_SEC,dev==='phone'?180:240);
+    assert.equal(MK.D.SESSION_END_SEC,180);
     for(let elapsed=0;elapsed<MK.D.SESSION_END_SEC*1000;elapsed+=250)e.tick(250);
     assert.equal(MK.S.ended,true);
     assert.deepEqual(scheduled.filter(id=>!MK.S.delivered[id]),[]);
     assert.equal(MK.S.taskOrder.length,MK.D.TASKS.length);
   });
 }
+
+
+test('세로 휴대폰 브라우저는 마우스 모드여도 PC 시작을 막고 회전 후 허용한다', () => {
+  const e=engine(),{MK}=e;e.setDevice(true,5,'Desktop');MK.prepare('pc');
+  assert.equal(MK.orientationBlocked(),true);MK.begin();assert.equal(MK.S.running,false);
+  e.setDevice(false,5,'Desktop');MK.begin();assert.equal(MK.S.running,true);
+  e.setDevice(true,0,'Desktop');assert.equal(MK.orientationBlocked(),false);
+  e.setDevice(true,0,'Android');assert.equal(MK.orientationBlocked(),true);
+});
+
+test('변조된 자료실은 PDF 대신 별도 주소와 실행 감지를 표시하고 담당자가 변조를 확인한다', () => {
+  const {MK,PCUI,root,flush}=engine();MK.ui=PCUI;PCUI.mount();MK.S.running=true;PCUI.render();
+  act(root,'desk-browser');clickNode(root,n=>n.tag==='button'&&n.textContent==='한빛상사');act(root,'clickfix');
+  assert.ok(textOf(root).includes('files.hanbit-docs.example'));act(root,'cf-check');act(root,'expose');
+  assert.equal(MK.S.st.P1.result,'exposed');assert.ok(textOf(root).includes('실행이 감지됐습니다'));assert.equal(MK.S.tasks.t3,undefined);
+  act(root,'cf-leave');clickNode(root,n=>n.tag==='button'&&n.textContent==='담당자에게 메일로 요청');
+  MK.replyChips('pm_partner').find(x=>x.label.includes('로봇 확인')).run();flush();
+  assert.equal(MK.S.st.P1.verify,true);assert.ok(textOf(root).includes('다운로드 경로에 이상한 페이지'));
+});
+
+test('택배 기사에게 경비실을 선택하면 완료 문자와 배송 조회에 같은 장소가 나온다', () => {
+  const e=phoneEngine(),{MK,root}=e;MK.deliver(MK.ITEM.L10);act(root,'answer');e.advance(1000);e.advance(1000);
+  clickNode(root,n=>n.tag==='button'&&n.textContent==='경비실에 맡겨 주세요');
+  MK.deliver(MK.ITEM.L3);assert.ok(MK.threadLast(MK.ITEM.L3.thread).text.includes('경비실에'));
+  assert.ok(textOf(MK.shopView({surface:'phone',tab:'tracking:knit',onNavigate(){}})).includes('수령 장소: 경비실'));
+});

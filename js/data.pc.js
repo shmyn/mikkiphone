@@ -22,7 +22,10 @@
     "asks": [
       {
         "label": "수정본 견적서도 보내셨나요?",
-        "delays": [1000, 4400],
+        "delays": [
+          1000,
+          4400
+        ],
         "ifArrived": "P2",
         "verify": "ask_partner_p2",
         "then": [
@@ -32,11 +35,19 @@
       },
       {
         "label": "회사 소개서도 메일로 부탁드려요",
-        "verify": "ask_partner_p1",
         "then": [
           "네, 바로 보내드리겠습니다."
         ],
         "deliver": "Lp11"
+      },
+      {
+        "label": "자료실에서 로봇 확인이 떠요. 정상인가요?",
+        "ifOpened": "P1",
+        "verify": "ask_partner_p1",
+        "then": [
+          "확인해 보니 홈페이지와 별도로 운영하는 자료 다운로드 경로에 이상한 페이지가 연결돼 있었습니다. 링크가 보여도 사용하지 마세요.",
+          "PDF는 이 메일로 다시 요청하시면 보내드릴게요. 안내대로 프로그램을 실행했다면 사내 IT지원팀에 알려 주세요."
+        ]
       }
     ]
   },
@@ -145,7 +156,10 @@
     "asks": [
       {
         "label": "혹시 메일로 상품권 부탁하셨어요?",
-        "delays": [1400, 3700],
+        "delays": [
+          1400,
+          3700
+        ],
         "ifArrived": "P7",
         "verify": "ask_park",
         "then": [
@@ -259,13 +273,16 @@
       },
       {
         "label": "발신 주소가 it-helpdesk@company-support.example예요",
-        "delays": [2100, 4900],
+        "delays": [
+          2100,
+          4900
+        ],
         "ifAsked": "pc_it:0",
         "ifArrived": "P3",
         "verify": "ask_it_p3",
         "then": [
           "확인했습니다. 오늘 저희 쪽에서 따로 설치 파일을 발송한 내역은 없네요.",
-          "이번 주 업데이트는 기존 관리 프로그램으로 배포 중입니다. 보내주신 메일은 담당자가 확인해 보겠습니다."
+          "보안 업데이트는 회사 관리 정책으로 자동 설치됩니다. 재시작이 필요하면 Windows 업데이트 설정에서 예약하시면 됩니다."
         ]
       },
       {
@@ -353,7 +370,7 @@
   {
     "id": "Lp1",
     "kind": "legit",
-    "at": 4,
+    "at": 3,
     "title": "팀장 업무 메시지",
     "channel": "chat",
     "thread": "pc_park",
@@ -370,7 +387,7 @@
   {
     "id": "Lp2",
     "kind": "legit",
-    "at": 14,
+    "at": 11,
     "title": "거래처 견적서 메일",
     "channel": "mail",
     "thread": "pm_partner",
@@ -398,7 +415,7 @@
     "kind": "phish",
     "verified": true,
     "source": "기업 담당자 대상 압축 파일 속 바로가기 실행 스피어피싱(탐색 주간 보도)",
-    "at": 28,
+    "at": 21,
     "title": "견적서 수정본 압축 파일",
     "channel": "mail",
     "thread": "pm_p2",
@@ -432,7 +449,7 @@
   {
     "id": "Ap1",
     "kind": "ambient",
-    "at": 38,
+    "at": 29,
     "channel": "mail",
     "thread": "pm_letter",
     "subject": "일요일에 읽고 싶은 다섯 페이지",
@@ -441,7 +458,7 @@
   {
     "id": "Lp5",
     "kind": "legit",
-    "at": 48,
+    "at": 37,
     "title": "동료 점심 메시지",
     "channel": "chat",
     "thread": "pc_kim",
@@ -470,7 +487,7 @@
     "kind": "phish",
     "verified": true,
     "source": "KISA ‘개인정보 유출 보상금’ 미끼 경고",
-    "at": 70,
+    "at": 54,
     "title": "보상금 조회 프로그램 메일",
     "channel": "mail",
     "thread": "pm_p6",
@@ -497,19 +514,19 @@
   {
     "id": "Lp3",
     "kind": "legit",
-    "at": 82,
+    "at": 62,
     "title": "IT지원팀 보안 공지",
     "channel": "mail",
     "thread": "pm_it",
-    "subject": "이번 주 보안 업데이트 자동 배포 안내",
-    "body": "이번 주 보안 업데이트는 자동으로 배포됩니다. IT지원팀은 메일로 설치 파일을 보내지 않습니다.",
+    "subject": "Windows 보안 업데이트 · 재시작 안내",
+    "body": "회사 관리 정책에 따라 보안 업데이트는 자동으로 내려받아 설치됩니다. 재시작 알림이 오면 설정 > Windows 업데이트에서 오늘 22:00으로 예약해 주세요. IT지원팀은 메일 첨부로 설치 파일을 보내지 않습니다.",
     "taskStep": "security_notice_read"
   },
   {
     "id": "P3",
     "kind": "phish",
     "verified": false,
-    "at": 96,
+    "at": 72,
     "title": "IT팀 사칭 설치 파일",
     "channel": "mail",
     "thread": "pm_p3",
@@ -537,7 +554,7 @@
   {
     "id": "Lp6",
     "kind": "legit",
-    "at": 108,
+    "at": 81,
     "title": "지수 주말 사진",
     "channel": "chat",
     "thread": "pc_jisu",
@@ -560,7 +577,7 @@
     "id": "P5",
     "kind": "phish",
     "verified": false,
-    "at": 122,
+    "at": 91,
     "title": "지인 새 계정 사진 링크",
     "channel": "chat",
     "thread": "pc_p5",
@@ -585,14 +602,15 @@
   {
     "id": "Lp4",
     "kind": "legit",
-    "at": 136,
-    "title": "시스템 업데이트 알림",
+    "at": 100,
+    "title": "업데이트 재시작 필요",
     "channel": "toast",
-    "source": "시스템",
-    "body": "업데이트가 준비됐어요. 오늘 밤 자동으로 설치할까요?",
+    "source": "Windows 업데이트",
+    "body": "보안 업데이트가 설치됐습니다. 설치를 마치려면 PC를 재시작해야 합니다.",
     "actions": [
       {
-        "label": "오늘 밤 설치"
+        "label": "Windows 업데이트 열기",
+        "open": "settings"
       },
       {
         "label": "나중에"
@@ -602,7 +620,7 @@
   {
     "id": "Ap2",
     "kind": "ambient",
-    "at": 170,
+    "at": 127,
     "channel": "chat",
     "thread": "pc_group",
     "body": "오늘 15시~16시 엘리베이터 점검 있습니다."
@@ -611,7 +629,7 @@
     "id": "P7",
     "kind": "phish",
     "verified": false,
-    "at": 160,
+    "at": 119,
     "title": "팀장 사칭 상품권 요청",
     "channel": "mail",
     "thread": "pm_p7",
@@ -660,18 +678,18 @@
   {
     "id": "Lp9",
     "kind": "legit",
-    "at": 180,
+    "at": 135,
     "title": "인사팀 연말정산 안내",
     "channel": "mail",
     "thread": "pm_hr",
     "subject": "연말정산 간소화 자료 제출 안내",
-    "body": "사내 포털 인사 메뉴에서 12월 5일까지 제출해 주세요."
+    "body": "사내 포털 인사 메뉴에서 12월 5일까지 제출해 주세요. 연봉 조정 결과도 같은 포털에서 별도 공지됩니다."
   },
   {
     "id": "P8",
     "kind": "phish",
     "verified": false,
-    "at": 194,
+    "at": 145,
     "title": "인사 문서 열람 로그인",
     "channel": "mail",
     "thread": "pm_p8",
@@ -698,7 +716,7 @@
   {
     "id": "Lp8",
     "kind": "legit",
-    "at": 204,
+    "at": 153,
     "title": "쿠팡 출고 메일",
     "channel": "mail",
     "thread": "pm_moamall",
@@ -709,7 +727,7 @@
     "id": "P4",
     "kind": "phish",
     "verified": false,
-    "at": 216,
+    "at": 163,
     "title": "가짜 감염 경고창",
     "channel": "popup",
     "popup": {
@@ -736,11 +754,11 @@
   {
     "id": "Lp7",
     "kind": "legit",
-    "at": 148,
+    "at": 109,
     "title": "회의 일정 알림",
     "channel": "toast",
     "source": "캘린더",
-    "body": "15:00 주간 회의 (10분 전) · 2번 회의실",
+    "body": "오늘 15:00 주간 회의 장소 · 2번 회의실",
     "actions": [
       {
         "label": "확인"
@@ -751,9 +769,9 @@
     "id": "P1",
     "kind": "phish",
     "verified": true,
-    "source": "사용자가 직접 악성 명령어를 실행하게 만드는 수법(탐색 주간 보도)",
+    "source": "Microsoft Security Research · 정상 사이트 변조를 통한 ClickFix 관찰 사례",
     "at": null,
-    "title": "가짜 로봇 확인(명령어 실행)",
+    "title": "변조된 자료실 다운로드 화면",
     "channel": "page",
     "weights": {
       "권위": 1,
@@ -763,9 +781,9 @@
       "ask_partner_p1"
     ],
     "redFlags": [
-      "로봇 확인인데 명령어 실행을 요구",
-      "Win+R과 붙여넣기 안내",
-      "평소 쓰던 거래처 사이트에서 뜸(사이트 해킹)"
+      "공식 홈페이지에서 별도 다운로드 주소로 이동",
+      "PDF를 받기 전에 명령어 실행을 요구",
+      "담당자가 위탁 다운로드 경로의 변조를 확인"
     ]
   },
   {
@@ -788,7 +806,7 @@
   {
     "id": "Ap3",
     "kind": "ambient",
-    "at": 58,
+    "at": 45,
     "channel": "chat",
     "thread": "pc_yuna",
     "body": "하늘님 탕비실에 간식 들어왔대요. 나중에 오실 때 커피 한 잔 하실래요?",
@@ -927,6 +945,13 @@
     "text": "고객센터 공지사항",
     "actions": [],
     "verify": "moamall_notice_pc"
+  },
+  "pc_partner_download": {
+    "url": "files.hanbit-docs.example/brochure",
+    "secure": true,
+    "title": "한빛상사 자료 다운로드",
+    "text": "회사소개서 · 2026년판 / PDF 4MB",
+    "actions": []
   }
 };
 
@@ -1067,7 +1092,7 @@
   },
   {
     "id": "t5",
-    "text": "IT 공지 확인하고 오늘 밤 업데이트 예약하기",
+    "text": "IT 공지 확인 후 오늘 22시 재시작 예약",
     "requires": [
       "security_notice_read",
       "update_reserved"
@@ -1075,8 +1100,8 @@
   }
 ];
 
-  var SESSION_END_SEC = 240;
-  var EVENT_GAP_SEC = 10;
+  var SESSION_END_SEC = 180;
+  var EVENT_GAP_SEC = 8;
 
   function deepFreeze(o){ Object.getOwnPropertyNames(o).forEach(function(k){var v=o[k];if(v&&typeof v==="object")deepFreeze(v);});return Object.freeze(o); }
   var DATA = deepFreeze({THREADS:THREADS, ITEMS:ITEMS, PAGES:PAGES, BOOKMARKS:BOOKMARKS, FILES:FILES, DOCS:DOCS, TASKS:TASKS, SESSION_END_SEC:SESSION_END_SEC, EVENT_GAP_SEC:EVENT_GAP_SEC});

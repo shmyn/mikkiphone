@@ -71,7 +71,7 @@
       el("p", { cls: "intro-instruction", text: "평소처럼 일상생활을 수행해보세요" }),
       el("div", { cls: "modes" },
         btn("modebtn", "휴대폰 시작 · 3분", function () { MK.prepare("phone"); }, "mode-phone"),
-        btn("modebtn", "PC 시작 · 4분", function () { MK.prepare("pc"); }, "mode-pc")),
+        btn("modebtn", "PC 시작 · 3분", function () { MK.prepare("pc"); }, "mode-pc")),
       el("p", { cls: "fineprint", text: "가상 대화 · 실제 설치·전송 없음 · 진행 중 언제든 끝내고 결과 확인 가능" }),
       el("p", { cls: "copyright", text: "© 2026 KARGI. All rights reserved." }));
     MK.root.replaceChildren(card);
@@ -105,9 +105,11 @@
     MK.revealTasks(0);
     document.body.className = "mode-" + dev;
     MK.ui.mount();
+    MK.syncOrientation();
   };
   MK.begin = function () {
     var S = MK.S;
+    if (S.running || MK.orientationBlocked()) { MK.syncOrientation(); return; }
     S.running = true;
     S.last = performance.now();
     S.progress = el("progress", { cls: "session-progress", attrs: { max: MK.D.SESSION_END_SEC, value: 0, "aria-label": "시뮬레이션 진행도" } });
@@ -118,7 +120,13 @@
   };
   function stopTicker() { if (MK.S && MK.S.ticker) clearInterval(MK.S.ticker); }
 
-  MK.orientationBlocked = function () { return MK.dev === "pc" && window.matchMedia && window.matchMedia("(hover: none) and (pointer: coarse) and (orientation: portrait)").matches; };
+  MK.orientationBlocked = function () {
+    return MK.dev === "pc" && !!window.matchMedia && window.matchMedia("(orientation: portrait)").matches &&
+      !!(window.matchMedia("(any-pointer: coarse)").matches || navigator.maxTouchPoints > 0 ||
+        (navigator.userAgentData && navigator.userAgentData.mobile) || /Android|iPhone|iPad|Mobile/i.test(navigator.userAgent || ""));
+  };
+  MK.syncOrientation = function () { document.body.setAttribute("data-pc-portrait", String(MK.orientationBlocked())); };
+  if (window.addEventListener) window.addEventListener("resize", MK.syncOrientation);
   MK.now = function () { var S = MK.S; return S.used + (document.hidden || MK.orientationBlocked() ? 0 : performance.now() - S.last); };
   function tick() {
     var S = MK.S, p = performance.now();
@@ -209,12 +217,13 @@
     return MK.D.ITEMS.some(function (it) { return it.thread === id && MK.S.unread[it.id]; });
   };
   MK.cleanText = function (t) { return String(t).replace(/^\[(Web|국제)발신\]\n/, ""); };
+  MK.itemBody = function (it) { return MK.ui.itemBody ? MK.ui.itemBody(it) : it.body; };
   MK.threadLast = function (id) {
     var th = MK.D.THREADS[id], items = MK.threadItems(id);
     var timeline = MK.S.timeline[id] || [], latest = timeline[timeline.length - 1];
     if (items.length) {
       var it = items[items.length - 1], st = MK.S.st[it.id];
-      var t = th.app === "mail" ? it.subject : it.body;
+      var t = th.app === "mail" ? it.subject : MK.itemBody(it);
       if (latest && !latest.item && th.app !== "mail") t = latest.text;
       return { text: MK.cleanText(t), when: "지금", rank: (latest ? latest.seq : MK.S.order.indexOf(it.id)) + 1000 };
     }

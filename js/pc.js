@@ -59,7 +59,7 @@
     card.appendChild(head);
     if (it.actions) {
       var row = el("div", { cls: "toast-acts" });
-      it.actions.forEach(function (a) { row.appendChild(btn("mini", a.label, function () { card.remove(); MK.markOpened(it); render(); }, "toast-act")); });
+      it.actions.forEach(function (a) { row.appendChild(btn("mini", a.label, function () { card.remove(); notificationAction(it, a); }, "toast-act")); });
       card.appendChild(row);
     }
     toastEl.appendChild(card);
@@ -70,14 +70,19 @@
     var it = MK.ITEM[n.id];
     P.center = false;
     if (n.app === "mail" || n.app === "chat") { P.app = n.app; P.sel[n.app] = it.thread; }
-    else MK.markOpened(it);
+    else { MK.markOpened(it); if (it.id === "Lp4") P.app = "settings"; }
+    render(true);
+  }
+  function notificationAction(it, action) {
+    MK.markOpened(it);
+    if (action.open === "settings") { P.app = "settings"; P.center = false; }
     render(true);
   }
 
   // ---------- 그리기 ----------
   function render(moved) {
     if (!MK.S || MK.S.ended || !MK.S.running) return;
-    if (P.pendingPopup && P.app === "browser" && !P.modal && !P.popup) {
+    if (P.pendingPopup && P.app === "browser" && !P.modal && !P.popup && !P.browser.clickfix) {
       P.popup = { item: P.pendingPopup, stage: 0 }; MK.markOpened(P.pendingPopup); P.pendingPopup = null;
     }
     var kids = [desktop()];
@@ -149,7 +154,7 @@
           el("span", { cls: "bhead" }, el("span", { text: n.app === "system" ? it.source : APPS[n.app] })), el("span", { cls: "who", text: n.title }), el("span", { cls: "peek", text: n.text })));
       if (it.actions && MK.S.unread[n.id]) {
         var acts = el("div", { cls: "toast-acts" });
-        it.actions.forEach(function (a) { acts.appendChild(btn("mini", a.label, function () { MK.markOpened(it); render(); }, "toast-act")); });
+        it.actions.forEach(function (a) { acts.appendChild(btn("mini", a.label, function () { notificationAction(it, a); }, "toast-act")); });
         row.appendChild(acts);
       }
       c.appendChild(row);
@@ -359,7 +364,8 @@
       var p1 = MK.ITEM.P1;
       if (!MK.S.delivered.P1) MK.deliver(p1);
       MK.markOpened(p1);
-      B.item = "P1"; B.clickfix = "check"; render(); return;
+      B.stack.push({ page: B.page, item: B.item });
+      B.page = "pc_partner_download"; B.item = "P1"; B.clickfix = "check"; render(); return;
     }
     if (a.download) {
       var f = { name: a.download.name, type: a.download.type, item: it ? it.id : null };
@@ -370,16 +376,18 @@
   }
   function clickfixView() {
     var B = P.browser, p1 = MK.ITEM.P1;
-    var box = el("div", { cls: "cf-box", attrs: { role: "dialog", "aria-label": "보안 확인" } }, el("div", { cls: "cf-h" }, icon("shield", 18), el("span", { text: "보안 확인" })));
+    var label = B.clickfix === "done" ? "다운로드 중단" : "보안 확인";
+    var box = el("div", { cls: "cf-box", attrs: { role: "dialog", "aria-label": label } }, el("div", { cls: "cf-h" }, icon("shield", 18), el("span", { text: label })));
     if (B.clickfix === "check") {
       box.appendChild(el("p", { text: "계속하려면 로봇이 아님을 확인하세요." }));
       box.appendChild(el("button", { cls: "cf-check", attrs: { "data-act": "cf-check" }, onClick: function () { MK.enter(p1); B.clickfix = "steps"; render(); } }, el("span", { cls: "cf-tick" }), el("span", { text: "로봇이 아닙니다" })));
     } else if (B.clickfix === "steps") {
       box.appendChild(el("p", { text: "인증을 마치려면 아래 단계를 따라 하세요." }));
       box.appendChild(el("ol", { cls: "cf-steps" }, el("li", { text: "키보드에서 Win + R 을 누르세요" }), el("li", { text: "Ctrl + V 를 누르세요" }), el("li", { text: "Enter 를 누르세요" })));
-      box.appendChild(btn("btn", "안내대로 실행", function () { MK.expose(p1); B.clickfix = "done"; render(); }, "expose"));
+      box.appendChild(btn("btn", "안내대로 실행", function () { MK.expose(p1); B.clickfix = "done"; showToastText("Windows 보안 · 알 수 없는 프로그램 실행 감지"); render(); }, "expose"));
     } else {
-      box.appendChild(el("p", { text: "확인되었습니다. 잠시 후 다운로드가 시작됩니다." }));
+      box.appendChild(el("strong", { text: "보안 정책 알림" }));
+      box.appendChild(el("p", { text: "브라우저에서 시작된 알 수 없는 프로그램 실행이 감지됐습니다. 회사 소개서는 내려받지 않았습니다. IT지원팀에 실행 사실을 알리세요." }));
     }
     box.appendChild(btn("btn ghost", "페이지 나가기", function () { B.clickfix = null; var prev = B.stack.pop(); B.page = prev ? prev.page : null; B.item = prev ? prev.item : null; render(); }, "cf-leave"));
     return el("div", { cls: "cf-overlay" }, box);
@@ -461,8 +469,10 @@
     c.appendChild(el("div", { cls: "row static setrow" }, el("span", { cls: "rt", text: "알림 끄기(방해 금지)" }),
       el("button", { cls: "switch" + (P.dnd ? " on" : ""), attrs: { role: "switch", "aria-checked": String(P.dnd), "aria-label": "방해 금지", "data-act": "set-dnd" }, onClick: function () { P.dnd = !P.dnd; render(); } }, el("span"))));
     var up = MK.ITEM.Lp4, ready = MK.S.delivered.Lp4;
-    c.appendChild(el("div", { cls: "row static setrow" }, el("span", { cls: "rt", text: "업데이트" }),
-      ready ? btn("mini", MK.S.taskSteps.update_reserved ? "오늘 밤 설치 예약됨" : "오늘 밤 설치", function () { MK.markOpened(up); MK.taskStep("update_reserved"); render(); }, "update") : el("span", { cls: "rs", text: "최신 상태" })));
+    c.appendChild(el("div", { cls: "row static setrow" }, el("span", { cls: "rt", text: "Windows 업데이트" }),
+      el("span", { cls: "rs", text: ready ? "보안 업데이트 설치됨 · 재시작 필요" : "재시작이 필요한 업데이트 없음" })));
+    if (ready) c.appendChild(MK.S.taskSteps.update_reserved ? el("p", { cls: "soft", text: "오늘 22:00 재시작 예약됨" }) :
+      btn("btn small", "오늘 22:00 재시작 예약", function () { MK.markOpened(up); MK.taskStep("update_reserved"); render(); }, "update"));
     c.appendChild(el("div", { cls: "row static setrow" }, el("span", { cls: "rt", text: "기기 이름" }), el("span", { cls: "rs", text: "SALES-PC-07" })));
     return c;
   }

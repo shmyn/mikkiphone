@@ -23,6 +23,18 @@
     var host=el("div",{cls:"market market-"+(opts.surface||"phone")});
     var parts=tab.split(":"),current=product(parts[1]),totalCount=Object.keys(state.cart).reduce(function(n,id){return n+state.cart[id];},0);
     if((parts[0]==="product"||parts[0]==="reviews") && state.recent[0]!==current.id)state.recent=[current.id].concat(state.recent.filter(function(id){return id!==current.id;})).slice(0,6);
+    var orderId=opts.surface==="pc"?"mouse":"knit";
+    function orderStatus(id){
+      if(id!==orderId)return "배송완료";
+      if(id==="mouse")return MK.S.delivered.Lp8?"배송중":"배송준비";
+      return MK.S.delivered.L3?"배송완료":MK.S.delivered.L2?"배송중":"배송준비";
+    }
+    function trackingText(id){
+      var status=orderStatus(id);
+      if(status==="배송완료")return "배송이 완료되었습니다. 수령 장소: "+(id==="knit"&&MK.ui.deliveryLocation?MK.ui.deliveryLocation():"문 앞");
+      if(status==="배송중")return id==="mouse"?"상품이 출고됐어요. 내일 도착 예정이에요.":"기사님이 배송 중입니다. 오늘 도착 예정이에요.";
+      return "상품을 준비하고 있어요. 발송되면 배송 상태가 표시됩니다.";
+    }
     function nav(next){state.message="";state.scroll[(opts.surface||"phone")+":"+next]=0;opts.onNavigate(next);}
     function notify(text){state.message=text;host.replaceChildren();build();}
     function card(p){
@@ -60,9 +72,9 @@
         else host.appendChild(el("div",{cls:"market-total"},el("span",{text:"상품 합계 · 배송비 무료"}),el("strong",{text:money(total)}),parts[0]==="checkout"?el("p",{text:"배송지: 집 · 실제 결제는 진행되지 않는 주문 미리보기입니다."}):btn("market-add","주문서 보기",function(){nav("checkout");},"shop-checkout")));
       }else if(parts[0]==="orders"){
         host.appendChild(el("h2",{cls:"market-section-title",text:"주문내역"}));
-        [["knit",MK.S.delivered.L3?"배송완료":MK.S.delivered.L2?"배송중":"배송준비", "11월 4일 주문"],["mug","배송완료","10월 29일 주문"],["backpack","배송완료","10월 15일 주문"]].forEach(function(order){var p=product(order[0]);host.appendChild(el("article",{cls:"market-order"},el("header",null,el("strong",{text:order[1]}),el("small",{text:order[2]})),el("div",{cls:"market-order-main"},image(p.photo,p.name),el("div",null,el("strong",{text:p.name}),el("p",{text:money(p.price)+" · 1개"}),el("small",{text:order[0]==="knit"?"CJ대한통운 · 배송지: 집":"수령 장소: 문 앞"}))),el("div",{cls:"market-order-actions"},btn("","상품 보기",function(){nav("product:"+p.id);}),btn("","배송 조회",function(){nav("tracking:"+p.id);},"track-"+p.id))));});
+        [[orderId,orderStatus(orderId), "11월 4일 주문"],["mug","배송완료","10월 29일 주문"],["backpack","배송완료","10월 15일 주문"]].forEach(function(order){var p=product(order[0]);host.appendChild(el("article",{cls:"market-order"},el("header",null,el("strong",{text:order[1]}),el("small",{text:order[2]})),el("div",{cls:"market-order-main"},image(p.photo,p.name),el("div",null,el("strong",{text:p.name}),el("p",{text:money(p.price)+" · 1개"}),el("small",{text:order[0]===orderId?"CJ대한통운 · 배송지: 집":"수령 장소: 문 앞"}))),el("div",{cls:"market-order-actions"},btn("","상품 보기",function(){nav("product:"+p.id);}),btn("","배송 조회",function(){nav("tracking:"+p.id);},"track-"+p.id))));});
       }else if(parts[0]==="tracking"){
-        host.appendChild(el("section",{cls:"market-description"},el("h2",{text:"배송 조회"}),image(current.photo,current.name,"market-track-photo"),el("strong",{text:current.name}),el("p",{text:current.id!=="knit"||MK.S.delivered.L3?"배송이 완료되었습니다. 수령 장소: 문 앞":MK.S.delivered.L2?"기사님이 배송 중입니다. 오늘 도착 예정이에요.":"상품을 준비하고 있어요. 발송되면 배송 상태가 표시됩니다."}),el("p",{text:"CJ대한통운 · 운송장 68●● ●●●● 1024"}),el("ol",{cls:"market-tracking"},el("li",{text:"상품 준비"}),el("li",{text:"택배사 상품 인수"}),el("li",{text:"배송 출발"}),el("li",{text:current.id!=="knit"||MK.S.delivered.L3?"배송 완료":"배달 예정"}))));
+        host.appendChild(el("section",{cls:"market-description"},el("h2",{text:"배송 조회"}),image(current.photo,current.name,"market-track-photo"),el("strong",{text:current.name}),el("p",{text:trackingText(current.id)}),el("p",{text:"CJ대한통운 · 운송장 68●● ●●●● 1024"}),el("ol",{cls:"market-tracking"},el("li",{text:"상품 준비"}),el("li",{text:"택배사 상품 인수"}),el("li",{text:"배송 출발"}),el("li",{text:orderStatus(current.id)==="배송완료"?"배송 완료":"배달 예정"}))));
       }else if(parts[0]==="notice"){
         host.appendChild(el("h2",{cls:"market-section-title",text:"고객센터"}));
         [["배송 일정 및 주문 조회 안내","delivery"],["쿠폰 사용과 적용 순서","coupon"],["고객센터 안내 및 사칭 연락 주의","security"]].forEach(function(notice){host.appendChild(btn("market-notice",notice[0],function(){nav("notice-detail:"+notice[1]);},"notice-"+notice[1]));});
