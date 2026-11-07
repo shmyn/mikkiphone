@@ -52,7 +52,7 @@ function engine() {
   const context = vm.createContext({ document, performance: { now: () => clock.value },
     setTimeout: (fn, at) => { timers.push({fn, at}); }, clearInterval() {}, setInterval(fn) { ticker = fn; return 1; },
     navigator: {}, window: { addEventListener(name, fn) { windowEvents[name] = fn; }, MK_COMMON: require('../js/data.common'), MK_PC: require('../js/data.pc'),
-      MK_PHONE: require('../js/data.phone'), MK_SCORING: require('../js/scoring'), MK_CONFIG: { LINE_MS:200, RING_SECONDS:15, BANNER_MS:4500 },
+      MK_PHONE: require('../js/data.phone'), MK_SCORING: require('../js/scoring'), MK_CONFIG: { SITE_URL:"https://mikkiphone.example/", LINE_MS:200, RING_SECONDS:15, BANNER_MS:4500 },
       Image: class { constructor(){this.naturalWidth=1200;this.naturalHeight=800;} set src(value){this.source=value;this.onload();} },
       MK_ICON: () => new Node('svg') } });
   for (const name of ['core', 'world', 'social', 'phone', 'pc']) vm.runInContext(fs.readFileSync(path.join(__dirname, '../js/' + name + '.js'), 'utf8'), context);
@@ -115,7 +115,7 @@ test('PC 메신저도 받은 메시지와 내 답장을 같은 흐름에 기록�
   assert.deepEqual(Array.from(MK.S.timeline.pc_kim, e => e.item || e.text), ['Lp5', '국밥 가요', '좋아요 12시에 봬요']);
 });
 
-test('결과 화면은 복사 버튼 하나와 기본으로 펼친 상세 기록을 제공한다', () => {
+test('결과 화면은 공유 링크와 기본으로 펼친 상세 기록을 제공한다', () => {
   const {MK, root} = engine();
   MK.deliver(MK.ITEM.Lp2);
   MK.deliver(MK.ITEM.P2);
@@ -124,7 +124,8 @@ test('결과 화면은 복사 버튼 하나와 기본으로 펼친 상세 기록
   function visit(n) { nodes.push(n); (n.children || []).forEach(visit); }
   visit(root);
   const buttons = nodes.filter(n => n.tag === 'button').map(n => n.textContent);
-  assert.equal(buttons.filter(t => t.includes('복사')).length, 1);
+  assert.ok(buttons.includes('결과 화면 공유하기'));
+  assert.match(nodes.find(n => n.className === 'sharebox').textContent, /\/r\/blocker\.html#0,0,1,0,1$/);
   assert.ok(!buttons.includes('가족·동료에게 보내기'));
   assert.equal(nodes.filter(n => n.tag === 'details' && n.className.includes('r-detail')).length, 1);
   assert.ok(Object.hasOwn(nodes.find(n => n.tag === 'details').attrs, 'open'));

@@ -68,17 +68,27 @@ def result_page(key, t, site):
   <meta property="og:image" content="{escape(img)}">{og_url}
   <meta name="twitter:card" content="summary_large_image">
   <link rel="icon" href="../og/favicon.png">
-  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/style.css?v=20261107-13">
 </head>
 <body>
   <main class="stage">
-    <section class="startcard">
-      <div class="bobber" aria-hidden="true"></div>
-      <h1 class="wordmark">미끼폰</h1>
-      <p class="lede">친구의 결과: {escape(t['name'])}</p>
+    <section class="resultpage">
+      <a class="result-home" href="../index.html" aria-label="미끼폰 홈으로">
+        <span class="bobber" aria-hidden="true"></span>미끼폰
+      </a>
+      <header class="r-head">
+        <h1>{escape(t['name'])}</h1>
+        <p class="r-line">{escape(t['line'])}</p>
+        <div class="result-stats" id="shared-stats" hidden>
+          <div><strong id="shared-risk"></strong><span>위험 지수 / 100</span></div>
+          <div><strong id="shared-exposure"></strong><span>설치·정보 제공</span></div>
+          <div><strong id="shared-legit"></strong><span>진짜 연락 확인</span></div>
+        </div>
+      </header>
       <div class="modes"><a class="modebtn" href="../index.html">나도 해보기</a></div>
     </section>
   </main>
+  <script src="../js/shared-result.js?v=1"></script>
 </body>
 </html>
 """

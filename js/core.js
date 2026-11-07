@@ -456,7 +456,7 @@
   function showResult(recs) {
     var r = SC.score(recs, { AXES: COMMON.AXES, AXIS_TO_TYPE: COMMON.AXIS_TO_TYPE, ITEMS: MK.D.ITEMS });
     var T = COMMON.TYPES[r.typeKey];
-    var shareUrl = buildShareUrl(r.typeKey);
+    var shareUrl = buildShareUrl(r);
     var phishRecs = recs.filter(function (x) { return MK.ITEM[x.id].kind === "phish"; });
     var legitRecs = recs.filter(function (x) { return MK.ITEM[x.id].kind === "legit"; });
     var modeName = MK.dev === "pc" ? "PC" : "휴대폰";
@@ -501,7 +501,7 @@
     detail.appendChild(content); page.appendChild(detail);
     var note = el("p", { cls: "toast", attrs: { role: "status" } });
     page.appendChild(el("div", { cls: "sharebtns" },
-      btn("btn", "결과 복사", function () { copy(box.textContent, note); }, "copy"),
+      btn("btn", "결과 화면 공유하기", function () { shareResult(shareUrl, box.textContent, note); }, "copy"),
       btn("btn ghost", "이미지 저장", function () { saveCard(r, T, phishRecs, note, modeName); }),
       btn("btn ghost", "X에 공유", function () { shareX(shareText, shareUrl); })));
     page.appendChild(note);
@@ -514,11 +514,21 @@
     focusView(page);
   }
 
-  // 공유 링크는 정해진 유형 이름 6개 중 하나만 붙인다(사용자 입력이 URL에 섞이지 않음)
-  function buildShareUrl(typeKey) {
-    if (!Object.prototype.hasOwnProperty.call(COMMON.TYPES, typeKey)) return "";
-    if (CONFIG.SITE_URL && /^https:\/\//.test(CONFIG.SITE_URL)) return CONFIG.SITE_URL + "r/" + typeKey + ".html";
-    return "";
+  // 유형별 페이지는 링크 미리보기를 맡고 요약 수치는 주소의 # 뒤에 담는다.
+  function buildShareUrl(r) {
+    if (!Object.prototype.hasOwnProperty.call(COMMON.TYPES, r.typeKey)) return "";
+    if (!CONFIG.SITE_URL || !/^https:\/\//.test(CONFIG.SITE_URL)) return "";
+    var summary = [r.R, r.exposures, r.phishCount, r.handled, r.legitCount].join(",");
+    return CONFIG.SITE_URL + "r/" + r.typeKey + ".html#" + summary;
+  }
+  function shareResult(url, text, note) {
+    if (url && navigator.share) {
+      navigator.share({ title: "미끼폰 결과", url: url }).catch(function (error) {
+        if (error.name !== "AbortError") copy(url, note);
+      });
+    } else {
+      copy(url || text, note);
+    }
   }
   function copy(text, t) {
     var fail = function () { t.textContent = "복사 실패 · ‘내 행동 자세히 보기’에서 결과 문구를 선택해 복사"; };

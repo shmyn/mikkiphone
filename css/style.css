@@ -571,3 +571,8 @@ body:not(.mode-phone):not(.mode-pc) .stage { padding:max(28px,env(safe-area-inse
 
 .r-foot .experience-switch { color: #fff; background: #25333c; font-size: 15px; min-height: 48px; }
 .r-foot:not(:has(.experience-switch)) { grid-template-columns: 1fr; }
+
+.result-stats[hidden] { display: none; }
+.resultpage .r-head h1 { margin: 0; font-size: clamp(26px, 6vw, 40px); line-height: 1.2; }
+.resultpage a.result-home, .resultpage a.modebtn { text-decoration: none; }
+.resultpage > .modes { margin-top: 22px; }
