@@ -563,6 +563,14 @@ body:not(.mode-phone):not(.mode-pc) .stage { padding:max(28px,env(safe-area-inse
 .startcard .wordmark { font-size:clamp(52px,16vw,72px); }
 .intro-copy, .intro-footer { word-break:keep-all; overflow-wrap:break-word; }
 .startcard .modes { width:100%; }
+@media (max-width: 640px) {
+  #app:has(> .startcard) {
+    align-content: start;
+    padding-top: max(clamp(32px, 9svh, 76px), env(safe-area-inset-top));
+  }
+  .startcard .intro-copy { margin-bottom: 26px; }
+  .startcard .intro-footer { margin-top: 24px; }
+}
 @media (max-width:420px) {
   .startcard .modebtn { padding:16px 18px; }
 }
